@@ -10,7 +10,7 @@ bool Sqlite::Connect()
     db.setDatabaseName(DATABASE);
     if(!db.open()) return false;
     QSqlQuery query;
-    query.exec("create table user_15693 (cardID vchar, name vchar, telphone vchar(12),  gender vchar, age int, isLocked bool, primary key (cardID))");
+    query.exec("create table user_15693 (cardID vchar, name vchar,  gender vchar, age int, telphone vchar(12), isLocked bool, primary key (cardID))");
     query.exec("create table books_15693 (booksID vchar, goodsID vchar, name vchar, author vchar, publishing_house vchar, publishing_time vchar, count int, residue int, primary key (booksID))");
     query.exec("create table record_15693 (recordID integer PRIMARY KEY autoincrement , cardID vchar, booksID vchar, lend_time vchar, return_time vchar, FOREIGN KEY (cardID ) REFERENCES user(cardID), FOREIGN KEY (booksID ) REFERENCES user(booksID))");
     return true;
@@ -58,9 +58,9 @@ QSqlQuery Sqlite::Select(QString table, QString value, QString where)
     return query;
 }
 //向user表中添加
-bool Sqlite::InsertUser(QString cardID, QString name, QString gender, int age)
+bool Sqlite::InsertUser(QString cardID, QString name, QString gender, int age, QString tel)
 {
-    return Insert("user_15693", "'"+cardID+"', '"+name+"', '"+gender+"', "+QString::number(age));
+    return Insert("user_15693", "'"+cardID+"', '"+name+"', '"+gender+"', "+QString::number(age)+", '"+tel+ "', "+"'false'");
 }
 //向books表中添加
 bool Sqlite::InsertBooks(QString booksID, QString name, QString author, QString publishing_house, int count, int residue)
@@ -79,27 +79,27 @@ bool Sqlite::DeleteUser(QString cardID, QString name, QString gender, int age)
     QString where;
     if( !cardID.isEmpty() )
         where += ("cardID = '" + cardID +"' ");
-    if( !name.isEmpty() )
-    {
-        if(where.isEmpty())
-            where += ("name = '" + name+"' ");
-        else
-            where += ("and name = '" + name+"' ");
-    }
-    if( !gender.isEmpty() )
-    {
-        if(where.isEmpty())
-            where += ("gender = '" + gender+"' ");
-        else
-            where += ("and gender = '" + gender+"' ");
-    }
-    if( age != -1 )
-    {
-        if(where.isEmpty())
-            where += ("age = " + QString::number(age));
-        else
-            where += ("and age = " + QString::number(age));
-    }
+//    if( !name.isEmpty() )
+//    {
+//        if(where.isEmpty())
+//            where += ("name = '" + name+"' ");
+//        else
+//            where += ("and name = '" + name+"' ");
+//    }
+//    if( !gender.isEmpty() )
+//    {
+//        if(where.isEmpty())
+//            where += ("gender = '" + gender+"' ");
+//        else
+//            where += ("and gender = '" + gender+"' ");
+//    }
+//    if( age != -1 )
+//    {
+//        if(where.isEmpty())
+//            where += ("age = " + QString::number(age));
+//        else
+//            where += ("and age = " + QString::number(age));
+//    }
     return Delete("user_15693", where);
 }
 //删除books表中数据

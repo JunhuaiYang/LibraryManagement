@@ -4,12 +4,14 @@ UserManage::UserManage(QWidget *parent) : QWidget(parent)
 {
     QString LabelName[] = {"卡号：", "姓名：", "性别：", "年龄：","手机号："}; //标签文本
     QString ButtonName[] = {"添加", "删除", "修改", "搜索"}; //按钮文本
+    QString ButtonEdit[] = {"挂失", "取消挂失", "注销用户"};  // 下面的按钮
 
     //布局
     QVBoxLayout *MainLayout = new QVBoxLayout();//主布局
     QHBoxLayout *ButtonLayout = new QHBoxLayout();//按钮布局
     QHBoxLayout *EditLayout = new QHBoxLayout();//文本框布局
     QHBoxLayout *TableLayout = new QHBoxLayout();//表格布局
+    QHBoxLayout *EditUserButton = new QHBoxLayout(); // 下面的按钮
 
     QGroupBox *UserTable = new QGroupBox();//用户表格组合框
     QGroupBox *UserInfo = new QGroupBox();//用户信息组合框
@@ -39,6 +41,9 @@ UserManage::UserManage(QWidget *parent) : QWidget(parent)
     regExp.setPattern("[9-0]{2}");
     Edit[Age_User]->setValidator(new QRegExpValidator(regExp, this));
 
+    regExp.setPattern("[9-0]{11}");
+    Edit[Tel_User]->setValidator(new QRegExpValidator(regExp, this));
+
     UserInfo->setLayout(EditLayout);//用户信息组合框设置布局
 
     //初始化按钮
@@ -50,6 +55,16 @@ UserManage::UserManage(QWidget *parent) : QWidget(parent)
     }
     ButtonLayout->addStretch(0);
     ButtonLayout->setSpacing(20);
+
+    //初始化用户按钮
+    for(int i = 0; i < Button_Count_Edit_USER; i++)
+    {
+        Edit_Button[i] = new QPushButton();
+        Edit_Button[i]->setText(ButtonEdit[i]);
+        EditUserButton->addWidget(Edit_Button[i]);//按钮添加到布局中
+    }
+    EditUserButton->addStretch(0);
+    EditUserButton->setSpacing(20);
 
     Table = new QTableWidget();
     Table->setColumnCount(Table_Column_USER);//设置表格列
@@ -63,6 +78,7 @@ UserManage::UserManage(QWidget *parent) : QWidget(parent)
     MainLayout->addWidget(UserInfo);
     MainLayout->addLayout(ButtonLayout);
     MainLayout->addWidget(UserTable);
+    MainLayout->addLayout(EditUserButton);
     MainLayout->setSpacing(10);
     this->setLayout(MainLayout);
     SetSlot();//设置槽函数
@@ -74,13 +90,37 @@ void UserManage::SetSlot()
     connect(Button[Delete_User],SIGNAL(clicked()),this,SLOT(delete_user()));//删除按钮连接槽函数
     connect(Button[Updata_User],SIGNAL(clicked()),this,SLOT(updata_user()));//修改按钮连接槽函数
     connect(Button[Select_User],SIGNAL(clicked()),this,SLOT(select_user()));//搜索按钮连接槽函数
+    connect(Edit_Button[Lost_User],SIGNAL(clicked()),this,SLOT(clickedLostUser()));//挂失按钮连接槽函数
+    connect(Edit_Button[Find_User],SIGNAL(clicked()),this,SLOT(clickedFindUser()));//取消挂失按钮连接槽函数
+    connect(Edit_Button[Logout_User],SIGNAL(clicked()),this,SLOT(clickedLogoutUser()));//注销按钮连接槽函数
     connect(Table,SIGNAL(cellClicked(int,int)),this,SLOT(get_table_line(int, int)));//表格点击连接槽函数
+}
+
+//挂失
+void UserManage::clickedLostUser()
+{
+    QMessageBox::warning(NULL, "warning", "不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+    return;
+}
+
+//取消挂失
+void UserManage::clickedFindUser()
+{
+    QMessageBox::warning(NULL, "warning", "不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+    return;
+}
+
+//注销
+void UserManage::clickedLogoutUser()
+{
+    QMessageBox::warning(NULL, "warning", "不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+    return;
 }
 
 //添加用户槽函数
 void UserManage::add_user()
 {
-    QString LabelName[] = {"卡号：", "姓名：", "性别：", "年龄："};
+    QString LabelName[] = {"卡号：", "姓名：", "性别：", "年龄：","手机号："}; //标签文本
      for(int i = 0; i < Edit_Count_USER; i++)
      {
          if(Edit[i]->text().isEmpty())
@@ -95,7 +135,7 @@ void UserManage::add_user()
          QMessageBox::warning(NULL, "warning", "卡号已经注册为书籍！", QMessageBox::Yes, QMessageBox::Yes);
          return;
      }
-    int ret = sql->InsertUser(Edit[ID_User]->text(),Edit[Name_User]->text(),Edit[Gender_User]->text(),Edit[Age_User]->text().toInt());
+    int ret = sql->InsertUser(Edit[ID_User]->text(),Edit[Name_User]->text(),Edit[Gender_User]->text(),Edit[Age_User]->text().toInt(),Edit[Tel_User]->text());
     if(!ret)
     {
         QMessageBox::warning(NULL, "warning", "添加失败，编号已存在！", QMessageBox::Yes, QMessageBox::Yes);
@@ -176,7 +216,7 @@ void UserManage::select_user()
 void UserManage::ShowTable(QSqlQuery query)
 {
     //设置表头
-    Table->setHorizontalHeaderLabels(QStringList()<<"卡号"<<"姓名"<<"性别"<<"年龄"<<"手机号"<<"是否激活");
+    Table->setHorizontalHeaderLabels(QStringList()<<"卡号"<<"姓名"<<"性别"<<"年龄"<<"手机号"<<"是否挂失");
     if(!query.next())
     {
         Table->setRowCount(0);//表格设置行数

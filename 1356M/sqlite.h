@@ -17,7 +17,7 @@ public:
     bool Delete(QString table, QString where);//删除
     bool Updata(QString table, QString value,QString where);//修改
     QSqlQuery Select(QString table, QString value, QString where);//查询
-    bool InsertUser(QString cardID, QString name, QString gender, int age);//插入用户表
+    bool InsertUser(QString cardID, QString name, QString gender, int age, QString tel);//插入用户表
     bool InsertBooks(QString booksID, QString name, QString author, QString publishing_house, int count, int residue);//插入图书表
     bool InsertRecord(QString cardID, QString booksID);//插入记录表
     bool DeleteUser(QString cardID = NULL, QString name = NULL, QString gender = NULL, int age = -1);//删除用户表中数据

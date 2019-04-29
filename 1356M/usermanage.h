@@ -16,12 +16,14 @@
 #include "sqlite.h"
 
 #define Button_Count_USER 4//按钮个数
+#define Button_Count_Edit_USER 3//下面按钮个数
 #define Edit_Count_USER 5//文本框个数
 #define Label_Count_USER 4//标签卡个数
 #define Table_Column_USER 6//表格列数
 
-enum Edit_Index_User{ID_User = 0, Name_User, Gender_User, Age_User};//卡号 姓名 性别 年龄
+enum Edit_Index_User{ID_User = 0, Name_User, Gender_User, Age_User, Tel_User};//卡号 姓名 性别 年龄
 enum Button_Index_User{Add_User = 0, Delete_User, Updata_User, Select_User};// 添加按钮 删除按钮 修改按钮 搜索按钮
+enum Button_Edit{Lost_User = 0, Find_User, Logout_User};
 
 class UserManage : public QWidget//用户管理界面
 {
@@ -40,9 +42,13 @@ public slots:
     void updata_user();//修改用户
     void select_user();//搜索用户
     void get_table_line(int row, int col);//表格单击事件 获取某行值
+    void clickedLostUser();
+    void clickedFindUser();
+    void clickedLogoutUser();
 
 private:
     QPushButton *Button[Button_Count_USER];//按钮
+    QPushButton *Edit_Button[Button_Count_Edit_USER];//按钮
     QLineEdit *Edit[Edit_Count_USER];//文本框
     QLabel *Label[Label_Count_USER];//标签
     QTableWidget *Table;//表格
