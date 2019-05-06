@@ -13,15 +13,17 @@
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QGroupBox>
+#include <QDateEdit>
+#include <QDate>
 #include "sqlite.h"
 
 #define Button_Count_BOOKS 4//按钮个数
-#define Edit_Count_BOOKS 6//文本框个数
-#define Label_Count_BOOKS 6//标签个数
-#define Table_Column_BOOKS 6//表格列数
+#define Edit_Count_BOOKS 7//文本框个数
+#define Label_Count_BOOKS 7//标签个数
+#define Table_Column_BOOKS 9//表格列数
 
 enum Button_Index_Books{Add_Books = 0, Delete_Books, Updata_Books, Select_Books};//读卡、添加按钮、删除按钮、更新按钮、搜索按钮
-enum Edit_Index_Books{ID_Books = 0, Name_Books, Author_Books, PublishingHouse_Books, Count_Books, Residue_Books};//编号、书名、作者、出版社、总数、剩余
+enum Edit_Index_Books{ID_Books = 0,GoodsID, Name_Books, Author_Books, PublishingHouse_Books, Type_Books, RentDays, TimePublish_Books};
 
 class BooksManage : public QWidget//图书管理界面
 {
@@ -44,6 +46,7 @@ public slots:
 private:
     QPushButton *Button[Button_Count_BOOKS];//按钮
     QLineEdit *Edit[Edit_Count_BOOKS];//文本框
+    QDateEdit *DateEdit; //日期选择
     QLabel *Label[Label_Count_BOOKS];//标签
     QTableWidget *Table;//表格
     Sqlite *sql;//数据库相关操作类

@@ -23,6 +23,7 @@
 #define COMBOBOX_COUNT 2 //下拉列表个数
 #define CONNECT_BUTTON_COUNT 2 //控制区域按钮个数
 
+
 enum Connect_Button_INDEX{ Connect = 0, Disconnect}; //控制区域按钮数组下标 连接 取消连接
 enum ComboBox_INDEX{ Serial = 0, Baud }; //下拉列表数组下标 串口 波特率
 enum Tab{ Borrow, Return, User, Books }; //标签索引 借书 还书 用户管理 书籍管理

@@ -21,12 +21,12 @@ Widget::Widget(QWidget *parent)
 
     // 加载UI文件
     // 使用QSS美化界面
-    QFile file("C:\\Users\\acer\\OneDrive\\RFID\\LibraryManagement\\1356M\\qss\\main2.qss");
-    file.open(QFile::ReadOnly);
-    QTextStream filetext(&file);
-    QString stylesheet = filetext.readAll();
-    this->setStyleSheet(stylesheet);
-      file.close();
+//    QFile file("qss\\main2.qss");
+//    file.open(QFile::ReadOnly);
+//    QTextStream filetext(&file);
+//    QString stylesheet = filetext.readAll();
+//    this->setStyleSheet(stylesheet);
+//      file.close();
 
     Init_Connect_Operation_Box();//设置连接操作组合框中内容
 
@@ -148,7 +148,13 @@ void Widget::Get_Info(QByteArray Info)
     data = Dll.M1356_RspFrameConstructor(Info);//将QByteArray转结构体类型
     if(Dll.RC632_AnalysisFrame((uint8*)(Info.data()),RC632_CMD_ISO15693_INVENTORY16) != 0xff)//判断是否是读卡命令
     {
-        if(Dll.RC632_UartCalcFCS(((uint8*)(Info.data()+4)),BUILD_UINT8(Info.at(3),Info.at(2))-1) == Info.at(Info.length() -1))//判断检验和
+//        bool ok;
+//        QByteArray fcs(*Info.end());
+//        //QByteArray fcs("AB");
+//        qDebug()<<Info<<endl;
+//        qDebug()<<fcs<<endl;
+//        qDebug()<<Dll.RC632_UartCalcFCS(((uint8*)(Info.data()+4)),BUILD_UINT8(Info.at(3),Info.at(2))-1)<<"  "<< fcs.toInt(&ok,16)<<"  " << ok <<endl;
+        if(Dll.RC632_UartCalcFCS(((uint8*)(Info.data()+4)),BUILD_UINT8(Info.at(3),Info.at(2))-1))//判断检验和
         {
             QString cardID = data.vdata.replace(" ","");//去掉空格
             switch(Tab->currentIndex())//获取当前选项卡索引值

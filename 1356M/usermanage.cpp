@@ -99,14 +99,38 @@ void UserManage::SetSlot()
 //挂失
 void UserManage::clickedLostUser()
 {
-    QMessageBox::warning(NULL, "warning", "不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+    //如果已经挂失
+    if(isLast == "true")
+    {
+        QMessageBox::warning(NULL, "error", "该账户已经被挂失！", QMessageBox::Yes, QMessageBox::Yes);
+    }
+    else {
+        if(sql->Updata("user_15693","isLocked = 'true'", "cardID = '"+Edit[ID_User]->text()+"'"))
+            QMessageBox::information(NULL, "information", "账户挂失成功！", QMessageBox::Yes, QMessageBox::Yes);
+        else {
+            QMessageBox::warning(NULL, "error", "账户挂失失败", QMessageBox::Yes, QMessageBox::Yes);
+        }
+    }
+    Clear();
     return;
 }
 
 //取消挂失
 void UserManage::clickedFindUser()
 {
-    QMessageBox::warning(NULL, "warning", "不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+    //如果没有挂失
+    if(isLast == "false")
+    {
+        QMessageBox::warning(NULL, "error", "该账户没有被挂失！", QMessageBox::Yes, QMessageBox::Yes);
+    }
+    else {
+        if(sql->Updata("user_15693","isLocked = 'false'", "cardID = '"+Edit[ID_User]->text()+"'"))
+            QMessageBox::information(NULL, "information", "账户取消挂失成功！", QMessageBox::Yes, QMessageBox::Yes);
+        else {
+            QMessageBox::warning(NULL, "error", "账户取消挂失失败", QMessageBox::Yes, QMessageBox::Yes);
+        }
+    }
+    Clear();
     return;
 }
 
@@ -189,7 +213,7 @@ void UserManage::updata_user()
         QMessageBox::warning(NULL, "warning", "卡号不存在！", QMessageBox::Yes, QMessageBox::Yes);
         return;
     }
-    int ret = sql->UpdataUser(Edit[ID_User]->text(),Edit[Name_User]->text(),Edit[Gender_User]->text(),Edit[Age_User]->text().toInt());
+    int ret = sql->UpdataUser(Edit[ID_User]->text(),Edit[Name_User]->text(),Edit[Gender_User]->text(),Edit[Age_User]->text().toInt(),Edit[Tel_User]->text() );
     if(!ret)
     {
         QMessageBox::warning(NULL, "warning", "修改失败！", QMessageBox::Yes, QMessageBox::Yes);
@@ -206,9 +230,9 @@ void UserManage::select_user()
 {
     QSqlQuery query;
     if(Edit[Age_User]->text().isEmpty())//如果年龄为空 调用SelectUser时 不传入年龄  默认年龄为-1
-        query = sql->SelectUser(Edit[ID_User]->text(),Edit[Name_User]->text(),Edit[Gender_User]->text());
+        query = sql->SelectUser(Edit[ID_User]->text(),Edit[Name_User]->text(),Edit[Gender_User]->text(),-1, Edit[Tel_User]->text());
     else
-        query = sql->SelectUser(Edit[ID_User]->text(),Edit[Name_User]->text(),Edit[Gender_User]->text(),Edit[Age_User]->text().toInt());
+        query = sql->SelectUser(Edit[ID_User]->text(),Edit[Name_User]->text(),Edit[Gender_User]->text(),Edit[Age_User]->text().toInt(), Edit[Tel_User]->text());
     ShowTable(query);
 }
 
@@ -246,6 +270,7 @@ void UserManage::get_table_line(int row, int col)
     {
         Edit[i]->setText(Table->item(row,i)->text());
     }
+    isLast = Table->item(row,Edit_Count_USER)->text();
 }
 //这是卡号
 void UserManage::SetCard(QString cardID)

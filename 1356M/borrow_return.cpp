@@ -3,13 +3,14 @@
 //借书界面
 Borrow_Return::Borrow_Return(QWidget *parent) : QWidget(parent)
 {
-    QString LabelNameUser[] = {"卡号：", "姓名：", "性别：", "年龄："}; //标签文本
+    QString LabelNameUser[] = {"卡号：", "姓名：", "性别：", "年龄：", "手机："}; //标签文本
 
     //布局
     QGridLayout *MainLayout = new QGridLayout();//主布局
     QVBoxLayout *UserLayout = new QVBoxLayout();//用户区域布局
     QVBoxLayout *RightLayout = new QVBoxLayout();//右侧布局
     QHBoxLayout *ButtonLayout = new QHBoxLayout();//右侧布局
+    Status = new QLabel();  // 状态栏
 
     //组合框
     QGroupBox *BooksGroupBox = new QGroupBox();
@@ -60,11 +61,19 @@ Borrow_Return::Borrow_Return(QWidget *parent) : QWidget(parent)
     QImage *jpg = new QImage(":/img/img/book.jpg");
     Picture->setPixmap(QPixmap::fromImage(*jpg));
 
+    // 设置状态栏
+    Status->setText("请先刷卡登录！");
+
     MainLayout->addWidget(UserGroupBox,0,0,1,1);
     MainLayout->addWidget(BooksGroupBox,0,1,2,1);
     MainLayout->addWidget(Picture,1,0,1,1);
+    MainLayout->addWidget(Status,2,0,1,2);
     MainLayout->setSpacing(20);
     this->setLayout(MainLayout);
+
+    // 先把表格静止
+
+    Table->setDisabled(true);
 }
 //表格显示
 void Borrow_Return::ShowTable(QSqlQuery query)
@@ -106,11 +115,16 @@ void Borrow_Return::SetInfo(QString cardID)
         }
         //将书信息显示到表格中
         ShowTable(sql->SelectBooksOfBorrow(cardID));//显示表格内容
+        // 显示表格
+        Table->setEnabled(true);
+        // 更新状态栏
+        Status->setText("登录成功！   请刷书籍卡借书或还书。");
         return;
     }
     query = sql->SelectBooks(cardID);
     if(query.next())//如果是书
     {
+        // 如果未登录
         if(Edit_User[CardId_User_Borrow]->text().isEmpty())
         {
             return;
@@ -128,7 +142,7 @@ void Borrow_Return::SetInfo(QString cardID)
             if(sql->InsertRecord(Edit_User[CardId_User_Borrow]->text(), query.value(0).toString()))//将用户ID和书籍编号添加到数据表中
             {
                 //书籍的剩余数量-1
-                sql->UpdataBooks(query.value(0).toString(),query.value(1).toString(),query.value(2).toString(),query.value(3).toString(),query.value(4).toInt(),query.value(5).toInt()-1);
+//                sql->UpdataBooks(query.value(0).toString(),query.value(1).toString(),query.value(2).toString(),query.value(3).toString(),query.value(4).toString(),query.value(5).toString(),query.value(6).toString());
             }
         }
         else
@@ -140,7 +154,7 @@ void Borrow_Return::SetInfo(QString cardID)
             if(sql->DeleteRecord(Edit_User[CardId_User_Borrow]->text(), query.value(0).toString()))//将用户ID和书籍编号添加到数据表中
             {
                 //书籍的剩余数量+1
-                sql->UpdataBooks(query.value(0).toString(),query.value(1).toString(),query.value(2).toString(),query.value(3).toString(),query.value(4).toInt(),query.value(5).toInt()+1);
+//                sql->UpdataBooks(query.value(0).toString(),query.value(1).toString(),query.value(2).toString(),query.value(3).toString(),query.value(4).toInt(),query.value(5).toInt()+1);
             }
         }
         ShowTable(sql->SelectBooksOfBorrow(Edit_User[0]->text()));//显示表格内容

@@ -18,8 +18,8 @@
 #define Button_Count_USER 4//按钮个数
 #define Button_Count_Edit_USER 3//下面按钮个数
 #define Edit_Count_USER 5//文本框个数
-#define Label_Count_USER 4//标签卡个数
 #define Table_Column_USER 6//表格列数
+#define Label_Count_USER 4//标签卡个数
 
 enum Edit_Index_User{ID_User = 0, Name_User, Gender_User, Age_User, Tel_User};//卡号 姓名 性别 年龄
 enum Button_Index_User{Add_User = 0, Delete_User, Updata_User, Select_User};// 添加按钮 删除按钮 修改按钮 搜索按钮
@@ -53,6 +53,7 @@ private:
     QLabel *Label[Label_Count_USER];//标签
     QTableWidget *Table;//表格
     Sqlite *sql;//数据库相关操作的类对象
+    QString isLast; //是否挂失
 };
 
 #endif // USERMANAGE_H

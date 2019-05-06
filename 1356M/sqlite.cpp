@@ -11,7 +11,7 @@ bool Sqlite::Connect()
     if(!db.open()) return false;
     QSqlQuery query;
     query.exec("create table user_15693 (cardID vchar, name vchar,  gender vchar, age int, telphone vchar(12), isLocked bool, primary key (cardID))");
-    query.exec("create table books_15693 (booksID vchar, goodsID vchar, name vchar, author vchar, publishing_house vchar, publishing_time vchar, count int, residue int, primary key (booksID))");
+    query.exec("create table books_15693 (booksID vchar, goodsID vchar, name vchar, author vchar, publishing_house vchar, book_type vchar, rent_days int, publishing_time vchar, isRent vchar, primary key (booksID))");
     query.exec("create table record_15693 (recordID integer PRIMARY KEY autoincrement , cardID vchar, booksID vchar, lend_time vchar, return_time vchar, FOREIGN KEY (cardID ) REFERENCES user(cardID), FOREIGN KEY (booksID ) REFERENCES user(booksID))");
     return true;
 }
@@ -63,9 +63,9 @@ bool Sqlite::InsertUser(QString cardID, QString name, QString gender, int age, Q
     return Insert("user_15693", "'"+cardID+"', '"+name+"', '"+gender+"', "+QString::number(age)+", '"+tel+ "', "+"'false'");
 }
 //向books表中添加
-bool Sqlite::InsertBooks(QString booksID, QString name, QString author, QString publishing_house, int count, int residue)
+bool Sqlite::InsertBooks(QString booksID, QString goodsID, QString name, QString author, QString publishing_house, QString book_type, QString rent_days, QString publishing_time)
 {
-    return Insert("books_15693", "'"+booksID+"', '"+name+"', '"+author+"', '"+publishing_house+"', "+QString::number(count)+", "+QString::number(residue));
+    return Insert("books_15693", "'" + booksID+"', '" + goodsID+ "', '"+name+"', '"+author+"', '"+publishing_house+ "', '"+ book_type+"', " + rent_days +", '"+publishing_time+"'"+", '否'");
 }
 //向record表中添加
 bool Sqlite::InsertRecord(QString cardID, QString booksID)
@@ -79,70 +79,14 @@ bool Sqlite::DeleteUser(QString cardID, QString name, QString gender, int age)
     QString where;
     if( !cardID.isEmpty() )
         where += ("cardID = '" + cardID +"' ");
-//    if( !name.isEmpty() )
-//    {
-//        if(where.isEmpty())
-//            where += ("name = '" + name+"' ");
-//        else
-//            where += ("and name = '" + name+"' ");
-//    }
-//    if( !gender.isEmpty() )
-//    {
-//        if(where.isEmpty())
-//            where += ("gender = '" + gender+"' ");
-//        else
-//            where += ("and gender = '" + gender+"' ");
-//    }
-//    if( age != -1 )
-//    {
-//        if(where.isEmpty())
-//            where += ("age = " + QString::number(age));
-//        else
-//            where += ("and age = " + QString::number(age));
-//    }
     return Delete("user_15693", where);
 }
 //删除books表中数据
-bool Sqlite::DeleteBooks(QString booksID, QString name, QString author, QString publishing_house, int count, int residue)
+bool Sqlite::DeleteBooks(QString booksID)
 {
-    QString where;
+    QString where = "";
     if( !booksID.isEmpty() )
         where += ("booksID = '" + booksID +"' ");
-    if( !name.isEmpty() )
-    {
-        if(where.isEmpty())
-            where += ("name = '" + name+"' ");
-        else
-            where += ("and name = '" + name+"' ");
-    }
-    if( !author.isEmpty() )
-    {
-        if(where.isEmpty())
-            where += ("author = '" + author+"' ");
-        else
-            where += ("and author = '" + author+"' ");
-    }
-    if( !publishing_house.isEmpty() )
-    {
-        if(where.isEmpty())
-            where += ("publishing_house = '" + publishing_house+"' ");
-        else
-            where += ("and publishing_house = '" + publishing_house+"' ");
-    }
-    if( count != -1 )
-    {
-        if(where.isEmpty())
-            where += ("count = " + QString::number(count)+" ");
-        else
-            where += ("and count = " + QString::number(count)+" ");
-    }
-    if( residue != -1 )
-    {
-        if(where.isEmpty())
-            where += ("residue = " + QString::number(residue)+" ");
-        else
-            where += ("and residue = " + QString::number(residue)+" ");
-    }
     return Delete("books_15693", where);
 }
 //删除record表中数据
@@ -161,17 +105,20 @@ bool Sqlite::DeleteRecord(QString cardID, QString booksID)
     return Delete("record_15693", where);
 }
 //修改user表中数据
-bool Sqlite::UpdataUser(QString cardID, QString name, QString gender, int age)
+bool Sqlite::UpdataUser(QString cardID, QString name, QString gender, int age, QString tel)
 {
-    return Updata("user_15693","cardID = '"+cardID+"', name = '"+name+"', gender = '"+gender+"', age = "+QString::number(age), "cardID = '"+cardID+"'");
+    return Updata("user_15693","cardID = '"+cardID+"', name = '"+name+"', gender = '"+gender+"', age = "+QString::number(age)+", telphone = '"+tel+"'", "cardID = '"+cardID+"'");
 }
 //修改books表中数据
-bool Sqlite::UpdataBooks(QString booksID, QString name, QString author, QString publishing_house, int count, int residue)
+bool Sqlite::UpdataBooks(QString booksID, QString goodsID, QString name, QString author, QString publishing_house, QString book_type, QString publishing_time, QString rent_days, QString isRent)
 {
-    return Updata("books_15693","booksID = '"+booksID+"', name = '"+name+"', author = '"+author+"', publishing_house = '"+publishing_house+"', count = "+QString::number(count)+", residue = "+QString::number(residue), "booksID = '"+booksID+"'");
+    if( isRent.isEmpty() )
+        return Updata("books_15693","booksID = '"+booksID+"', name = '"+name+"', author = '"+author+"', publishing_house = '"+publishing_house+ "', goodsID = '"+goodsID+ "', book_type = '"+book_type+ "', rent_days = "+ rent_days+ ", publishing_time = '"+publishing_time+"'", "booksID = '"+booksID+"'");
+    else
+        return Updata("books_15693","booksID = '"+booksID+"', name = '"+name+"', author = '"+author+"', publishing_house = '"+publishing_house+ "', goodsID = '"+goodsID+ "', isRent = '"+isRent+"', book_type = '"+book_type+ "', publishing_time = '"+publishing_time+"'", "booksID = '"+booksID+"'");
 }
 //查询user表中数据
-QSqlQuery Sqlite::SelectUser(QString cardID, QString name, QString gender, int age)
+QSqlQuery Sqlite::SelectUser(QString cardID, QString name, QString gender, int age, QString telphone)
 {
     QString where;
     if( !cardID.isEmpty() )
@@ -190,6 +137,13 @@ QSqlQuery Sqlite::SelectUser(QString cardID, QString name, QString gender, int a
         else
             where += ("and gender = '" + gender+"' ");
     }
+    if( !telphone.isEmpty() )
+    {
+        if(where.isEmpty())
+            where += ("telphone = '" + telphone+"' ");
+        else
+            where += ("and telphone = '" + telphone+"' ");
+    }
     if( age != -1 )
     {
         if(where.isEmpty())
@@ -201,7 +155,7 @@ QSqlQuery Sqlite::SelectUser(QString cardID, QString name, QString gender, int a
     return Select("user_15693", "*", where);
 }
 //查询books表中数据
-QSqlQuery Sqlite::SelectBooks(QString booksID, QString name, QString author, QString publishing_house, int count)
+QSqlQuery Sqlite::SelectBooks(QString booksID, QString name, QString author, QString publishing_house, QString book_type)
 {
     QString where;
     if( !booksID.isEmpty() )
@@ -227,13 +181,14 @@ QSqlQuery Sqlite::SelectBooks(QString booksID, QString name, QString author, QSt
         else
             where += ("and publishing_house = '" + publishing_house+"' ");
     }
-    if( count != -1 )
+    if( !book_type.isEmpty() )
     {
         if(where.isEmpty())
-            where += ("count = " + QString::number(count));
+            where += ("book_type = '" + book_type+"' ");
         else
-            where += ("and count = " + QString::number(count));
+            where += ("and book_type = '" + book_type+"' ");
     }
+
 
     return Select("books_15693", "*", where);
 }

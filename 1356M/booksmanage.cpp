@@ -2,7 +2,7 @@
 
 BooksManage::BooksManage(QWidget *parent) : QWidget(parent)
 {
-    QString LabelName[] = {"卡号：", "书名：", "作者：", "出版社：", "总数（本）", "剩余（本）"};//标签文本
+    QString LabelName[] = {"卡号：", "书籍编号：", "书名：", "作者：", "出版社：","图书类型：","可借天数：",  "出版时间:"};//标签文本
     QString ButtonName[] = {"添加", "删除", "修改", "搜索"};//按钮文本
     QVBoxLayout *MainLayout = new QVBoxLayout();//主布局
     QHBoxLayout *ButtonLayout = new QHBoxLayout();//按钮布局
@@ -19,14 +19,24 @@ BooksManage::BooksManage(QWidget *parent) : QWidget(parent)
         EditLayout->addWidget(Label[i]);//将文本框和标签添加到布局中
         EditLayout->addWidget(Edit[i]);
     }
+    // 日期选择
+    Label[Edit_Count_BOOKS] = new QLabel(LabelName[Edit_Count_BOOKS]);
+    DateEdit = new QDateEdit();
+    DateEdit->setDisplayFormat("yyyy-MM-dd");
+    EditLayout->addWidget(Label[Edit_Count_BOOKS]);//将文本框和标签添加到布局中
+    EditLayout->addWidget(DateEdit);
+
+    // 正则表达式
     QString pattern("[A-Fa-f9-0]*");
     QRegExp regExp(pattern);
     Edit[ID_Books]->setValidator(new QRegExpValidator(regExp, this));
 
-    pattern="[9-0]{3}";
-    regExp.setPattern(pattern);
-    Edit[Count_Books]->setValidator(new QRegExpValidator(regExp, this));
-    Edit[Residue_Books]->setValidator(new QRegExpValidator(regExp, this));
+    regExp.setPattern("[9-0]{13}");
+    Edit[GoodsID]->setValidator(new QRegExpValidator(regExp, this));
+
+    regExp.setPattern("[9-0]{3}");
+    Edit[RentDays]->setValidator(new QRegExpValidator(regExp, this));
+
 
     BookInfo->setLayout(EditLayout);//设置信息组合框的布局
 
@@ -68,10 +78,8 @@ void BooksManage::SetSlot()//设置槽函数
 
 void BooksManage::add_books()//添加按钮槽函数
 {
-    int residue;//图书的剩余数量
-
     /*文本框为空时显示错误提示*/
-    QString LabelName[] = {"卡号：", "书名：", "作者：", "出版社：", "总数（本）"};
+    QString LabelName[] = {"卡号：", "书籍编号：", "书名：", "作者：", "出版社：","图书类型：","可借天数：",  "出版时间:"};//标签文本
     for(int i = 0; i < Edit_Count_BOOKS-1; i++)
     {
         if(Edit[i]->text().isEmpty())
@@ -85,24 +93,11 @@ void BooksManage::add_books()//添加按钮槽函数
         QMessageBox::warning(NULL, "warning", "卡号已经注册为用户！", QMessageBox::Yes, QMessageBox::Yes);
         return;
     }
-    if (Edit[Residue_Books]->text().toInt() > Edit[Count_Books]->text().toInt())
-    {
-        QMessageBox::warning(NULL, "warning", "剩余数量不可以超出总数！", QMessageBox::Yes, QMessageBox::Yes);
-        return;
-    }
 
-    /*不填写剩余数量默认为总数量*/
-    if (Edit[Residue_Books]->text().isEmpty())
-    {
-        residue = Edit[Count_Books]->text().toInt();
-    }
-    else
-    {
-        residue = Edit[Residue_Books]->text().toInt();
-    }
+
 
     //向数据库中添加书籍
-    bool ret = sql->InsertBooks(Edit[ID_Books]->text(),Edit[Name_Books]->text(),Edit[Author_Books]->text(),Edit[PublishingHouse_Books]->text(),Edit[Count_Books]->text().toInt(),residue);
+    bool ret = sql->InsertBooks(Edit[ID_Books]->text(), Edit[GoodsID]->text(),Edit[Name_Books]->text(),Edit[Author_Books]->text(),Edit[PublishingHouse_Books]->text(), Edit[Type_Books]->text(),Edit[RentDays]->text(), DateEdit->text());
     if(!ret)
     {
         QMessageBox::warning(NULL, "warning", "添加失败，卡号已存在！", QMessageBox::Yes, QMessageBox::Yes);
@@ -127,19 +122,8 @@ void BooksManage::delete_books()
         return;
     }
 
-    int Count,Residue;
-    if(Edit[Residue_Books]->text().isEmpty())
-        Residue = -1;
-    else
-        Residue = Edit[Residue_Books]->text().toInt();
-
-    if(Edit[Count_Books]->text().isEmpty())
-        Count = -1;
-    else
-        Count = Edit[Count_Books]->text().toInt();
-
     //删除书籍
-    bool ret = sql->DeleteBooks(Edit[ID_Books]->text(),Edit[Name_Books]->text(),Edit[Author_Books]->text(),Edit[PublishingHouse_Books]->text(),Count,Residue);
+    bool ret = sql->DeleteBooks(Edit[ID_Books]->text());
     if(!ret)
     {
         QMessageBox::warning(NULL, "warning", "删除失败！", QMessageBox::Yes, QMessageBox::Yes);
@@ -163,13 +147,8 @@ void BooksManage::updata_books()
         QMessageBox::warning(NULL, "warning", "卡号不存在！", QMessageBox::Yes, QMessageBox::Yes);
         return;
     }
-    if (Edit[Residue_Books]->text().toInt() > Edit[Count_Books]->text().toInt())
-    {
-        QMessageBox::warning(NULL, "warning", "剩余数量不可以超出总数！", QMessageBox::Yes, QMessageBox::Yes);
-        return;
-    }
     //修改书籍信息
-    bool ret = sql->UpdataBooks(Edit[ID_Books]->text(),Edit[Name_Books]->text(),Edit[Author_Books]->text(),Edit[PublishingHouse_Books]->text(),Edit[Count_Books]->text().toInt(), Edit[Residue_Books]->text().toInt());
+    bool ret = sql->UpdataBooks(Edit[ID_Books]->text(),Edit[GoodsID]->text(),Edit[Name_Books]->text(),Edit[Author_Books]->text(),Edit[PublishingHouse_Books]->text(),Edit[Type_Books]->text(),DateEdit->text(), Edit[RentDays]->text());
     if(!ret)
     {
         QMessageBox::warning(NULL, "warning", "修改失败！", QMessageBox::Yes, QMessageBox::Yes);
@@ -184,10 +163,7 @@ void BooksManage::updata_books()
 void BooksManage::select_books()
 {
     QSqlQuery query;
-    if(Edit[Count_Books]->text().isEmpty())
-        query = sql->SelectBooks(Edit[ID_Books]->text(),Edit[Name_Books]->text(),Edit[Author_Books]->text(),Edit[PublishingHouse_Books]->text());
-    else
-        query = sql->SelectBooks(Edit[ID_Books]->text(),Edit[Name_Books]->text(),Edit[Author_Books]->text(),Edit[PublishingHouse_Books]->text(),Edit[Count_Books]->text().toInt());
+    query = sql->SelectBooks(Edit[ID_Books]->text(),Edit[Name_Books]->text(),Edit[Author_Books]->text(),Edit[PublishingHouse_Books]->text(), Edit[Type_Books]->text());
     ShowTable(query);//更新表格
     ClearEdit();//清空文本框
 }
@@ -195,7 +171,7 @@ void BooksManage::select_books()
 //显示表格
 void BooksManage::ShowTable(QSqlQuery query)
 {
-    Table->setHorizontalHeaderLabels(QStringList()<<"卡号"<<"书名"<<"作者"<<"出版社"<<"总计（本）"<<"剩余（本）");
+    Table->setHorizontalHeaderLabels(QStringList()<<"卡号"<<"书籍ISBN号"<<"书名"<<"作者"<<"出版社"<<"书籍类型"<<"可借时间(天)"<<"出版日期"<<"是否借出");
     if(!query.next())
     {
         Table->setRowCount(0);//表格设置行数
@@ -234,6 +210,11 @@ void BooksManage::get_table_line(int row, int col)
     {
         Edit[i]->setText(Table->item(row,i)->text());
     }
+    // 日期更新
+//    qDebug()<< Table->item(row, Edit_Count_BOOKS)->text() << endl;
+//    qDebug()<< QDate::fromString("2000/01/10", "yyyy/MM/dd").toString() << endl;
+    DateEdit->setDate( QDate::fromString(Table->item(row, Edit_Count_BOOKS)->text(), "yyyy-MM-dd") );
+
 }
 
 void BooksManage::SetCard(QString cardID)
