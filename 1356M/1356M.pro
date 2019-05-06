@@ -20,7 +20,7 @@ SOURCES += main.cpp\
     sqlite.cpp \
     uhf_thread.cpp \
     borrow_return.cpp \
-    record.cpp 
+    record.cpp  
 
 HEADERS  += widget.h \
     usermanage.h \
@@ -31,7 +31,7 @@ HEADERS  += widget.h \
     sqlite.h \
     uhf_thread.h \
     borrow_return.h \
-    record.h 
+    record.h  
 
 
 

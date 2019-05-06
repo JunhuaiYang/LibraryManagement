@@ -99,6 +99,12 @@ void UserManage::SetSlot()
 //挂失
 void UserManage::clickedLostUser()
 {
+    // 如果没有选中卡
+    if(Edit[ID_User]->text().isEmpty())
+    {
+        QMessageBox::warning(NULL, "error", "没有卡片或没有选中数据", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
     //如果已经挂失
     if(isLast == "true")
     {
@@ -118,6 +124,12 @@ void UserManage::clickedLostUser()
 //取消挂失
 void UserManage::clickedFindUser()
 {
+    // 如果没有选中卡
+    if(Edit[ID_User]->text().isEmpty())
+    {
+        QMessageBox::warning(NULL, "error", "没有卡片或没有选中数据", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
     //如果没有挂失
     if(isLast == "false")
     {
@@ -137,6 +149,14 @@ void UserManage::clickedFindUser()
 //注销
 void UserManage::clickedLogoutUser()
 {
+    // 如果没有选中卡
+    if(Edit[ID_User]->text().isEmpty())
+    {
+        QMessageBox::warning(NULL, "error", "没有卡片或没有选中数据", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
+
+    // TODO 后面的
     QMessageBox::warning(NULL, "warning", "不能为空！", QMessageBox::Yes, QMessageBox::Yes);
     return;
 }

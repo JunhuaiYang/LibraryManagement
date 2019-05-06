@@ -17,6 +17,7 @@
 #include <QDateTime>
 #include <QRadioButton>
 #include <QButtonGroup>
+#include <QMessageBox>
 #include "sqlite.h"
 #include "uhf_thread.h"
 

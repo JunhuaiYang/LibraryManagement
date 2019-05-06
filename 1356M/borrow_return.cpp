@@ -61,8 +61,7 @@ Borrow_Return::Borrow_Return(QWidget *parent) : QWidget(parent)
     QImage *jpg = new QImage(":/img/img/book.jpg");
     Picture->setPixmap(QPixmap::fromImage(*jpg));
 
-    // 设置状态栏
-    Status->setText("请先刷卡登录！");
+
 
     MainLayout->addWidget(UserGroupBox,0,0,1,1);
     MainLayout->addWidget(BooksGroupBox,0,1,2,1);
@@ -72,14 +71,14 @@ Borrow_Return::Borrow_Return(QWidget *parent) : QWidget(parent)
     this->setLayout(MainLayout);
 
     // 先把表格静止
+    Clear();
 
-    Table->setDisabled(true);
 }
 //表格显示
 void Borrow_Return::ShowTable(QSqlQuery query)
 {
     //设置表格表头
-    Table->setHorizontalHeaderLabels(QStringList()<<"卡号"<<"书名"<<"作者"<<"出版社"<<"总数（本）"<<"剩余（本）");
+    Table->setHorizontalHeaderLabels(QStringList()<<"用户卡号"<<"书名"<<"作者"<<"出版社"<<"总数（本）"<<"剩余（本）");
     if(!query.next())
     {
         Table->setRowCount(0);//表格设置行数
@@ -109,6 +108,14 @@ void Borrow_Return::SetInfo(QString cardID)
     QSqlQuery query = sql->SelectUser(cardID);
     if(query.next())//如果是用户
     {
+        // 判断是否被挂失
+        if(query.value(5).toString() == "true")
+        {
+            // 如果被挂失 弹出对话框
+            QMessageBox::warning(parentWidget(), tr("警告！"), tr("该用户已经被挂失！\n该卡无法使用！！"), QMessageBox::Ok, QMessageBox::NoButton);
+            Status->setText("登陆失败！   该卡已经被挂失！");
+            return;
+        }
         for(int i=0; i < Edit_Count_BORROW_RETURN; i++)
         {
             Edit_User[i]->setText(query.value(i).toString());
@@ -127,47 +134,83 @@ void Borrow_Return::SetInfo(QString cardID)
         // 如果未登录
         if(Edit_User[CardId_User_Borrow]->text().isEmpty())
         {
+            Status->setText("该卡是书！  请先刷用户卡登陆！");
             return;
         }
+        // 借书
         if(Borrow->isChecked())
         {
+            // TODO 该书籍已被自己借出
             if(sql->SelectRecord(Edit_User[CardId_User_Borrow]->text(), query.value(0).toString()).next())
             {
+                QMessageBox::information(parentWidget(), tr("提示！"), tr("该书籍已经被您借出\n若需要归还请点击还书按钮！！"),
+                                     QMessageBox::Ok, QMessageBox::NoButton);
                 return;
             }
-            if(query.value(5).toInt() <= 0)
+            // TODO 已经被别人借出
+            if(query.value(8).toString() == "是")
             {
+                QMessageBox::information(parentWidget(), tr("提示！"), tr("该书籍已经被其他人借出\n借书失败！"),
+                                          QMessageBox::Ok, QMessageBox::NoButton);
                 return;
             }
-            if(sql->InsertRecord(Edit_User[CardId_User_Borrow]->text(), query.value(0).toString()))//将用户ID和书籍编号添加到数据表中
+            // 借书确认弹窗
+            QMessageBox msg;
+            QString bookinfo;
+            bookinfo = "书名   ：  "+query.value(2).toString()+"\n"+
+                       "作者   ：  "+query.value(3).toString()+"\n"+
+                       "出版社 ：  "+query.value(4).toString()+"\n"+
+                       "可借天数：  "+query.value(6).toString()+" 天\n"+
+                    "请在到期前归还！\n\n是否借出？";
+            int ret = msg.question(parentWidget(),tr("借书"), bookinfo, QMessageBox::Ok, QMessageBox::Cancel);
+            // 确定
+            if(ret == QMessageBox::Ok)
             {
-                //书籍的剩余数量-1
-//                sql->UpdataBooks(query.value(0).toString(),query.value(1).toString(),query.value(2).toString(),query.value(3).toString(),query.value(4).toString(),query.value(5).toString(),query.value(6).toString());
+                // 加入记录表
+                if(sql->InsertRecord(query.value(0).toString(), Edit_User[CardId_User_Borrow]->text(), "sdf" ))
+                //书籍的状态改为已借出
+                sql->UpdataBooks(query.value(0).toString(),query.value(1).toString(),query.value(2).toString(),query.value(3).toString(),
+                                 query.value(4).toString(),query.value(5).toString(),query.value(6).toString(), query.value(7).toString(), "是" );
+
             }
+
         }
+        // 还书
         else
         {
-            if(!sql->SelectRecord(Edit_User[CardId_User_Borrow]->text(), query.value(0).toString()).next())
-            {
-                return;
-            }
-            if(sql->DeleteRecord(Edit_User[CardId_User_Borrow]->text(), query.value(0).toString()))//将用户ID和书籍编号添加到数据表中
-            {
-                //书籍的剩余数量+1
-//                sql->UpdataBooks(query.value(0).toString(),query.value(1).toString(),query.value(2).toString(),query.value(3).toString(),query.value(4).toInt(),query.value(5).toInt()+1);
-            }
+            // TODO 该书籍没有被该用户借出
+//            if(!sql->SelectRecord(Edit_User[CardId_User_Borrow]->text(), query.value(0).toString()).next())
+//            {
+//                QMessageBox::information(parentWidget(), tr("提示！"), tr("该书没有被您借出！\n还书失败！"),
+//                                          QMessageBox::Ok, QMessageBox::NoButton);
+//                return;
+//            }
+//                书籍状态改为已还书
+            sql->UpdataBooks(query.value(0).toString(),query.value(1).toString(),query.value(2).toString(),query.value(3).toString(),
+                             query.value(4).toString(),query.value(5).toString(),query.value(6).toString(), query.value(7).toString(), "否" );
+            // TODO 更新表格
+//            if(sql->DeleteRecord(Edit_User[CardId_User_Borrow]->text(), query.value(0).toString()))//将用户ID和书籍编号添加到数据表中
+//            {
+//            }
         }
         ShowTable(sql->SelectBooksOfBorrow(Edit_User[0]->text()));//显示表格内容
+        return;
     }
+    Status->setText("该卡没有在本系统中注册！");
 }
 
 //清空文本框和刷新表格
-
 void Borrow_Return::Clear()
 {
+    // 进入未登录的状态
     for(int i = 0; i < Edit_Count_BORROW_RETURN; i++)
     {
         Edit_User[i]->clear();
     }
     ShowTable(sql->SelectBooksOfBorrow(Edit_User[0]->text()));//显示表格内容
+    Table->setDisabled(true);
+
+    // 设置状态栏
+    Status->setText("请先刷卡登录！");
+
 }

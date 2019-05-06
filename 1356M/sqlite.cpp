@@ -12,7 +12,7 @@ bool Sqlite::Connect()
     QSqlQuery query;
     query.exec("create table user_15693 (cardID vchar, name vchar,  gender vchar, age int, telphone vchar(12), isLocked bool, primary key (cardID))");
     query.exec("create table books_15693 (booksID vchar, goodsID vchar, name vchar, author vchar, publishing_house vchar, book_type vchar, rent_days int, publishing_time vchar, isRent vchar, primary key (booksID))");
-    query.exec("create table record_15693 (recordID integer PRIMARY KEY autoincrement , cardID vchar, booksID vchar, lend_time vchar, return_time vchar, FOREIGN KEY (cardID ) REFERENCES user(cardID), FOREIGN KEY (booksID ) REFERENCES user(booksID))");
+    query.exec("create table record_15693 (recordID integer PRIMARY KEY autoincrement , cardID vchar, booksID vchar, lend_time vchar, return_time vchar,isRenting vchar, FOREIGN KEY (cardID ) REFERENCES user_15693(cardID), FOREIGN KEY (booksID ) REFERENCES books_15693(booksID))");
     return true;
 }
 //打印SQL语句
@@ -68,9 +68,9 @@ bool Sqlite::InsertBooks(QString booksID, QString goodsID, QString name, QString
     return Insert("books_15693", "'" + booksID+"', '" + goodsID+ "', '"+name+"', '"+author+"', '"+publishing_house+ "', '"+ book_type+"', " + rent_days +", '"+publishing_time+"'"+", '否'");
 }
 //向record表中添加
-bool Sqlite::InsertRecord(QString cardID, QString booksID)
+bool Sqlite::InsertRecord(QString booksID, QString cardID, QString lend_time)
 {
-    return Insert("record_15693", "'"+cardID+"', '"+booksID+"'");
+    return Insert("record_15693", "NULL, '"+cardID+"', '"+booksID+"', '"+lend_time+"', NULL, '是'");
 }
 
 //删除user表中数据
@@ -193,6 +193,7 @@ QSqlQuery Sqlite::SelectBooks(QString booksID, QString name, QString author, QSt
     return Select("books_15693", "*", where);
 }
 
+// 查找用户借书
 QSqlQuery Sqlite::SelectRecord(QString cardID, QString booksID)
 {
     QString where;

@@ -330,9 +330,9 @@ debug/moc_widget.cpp: D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QWidget \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QString \
 		../1356M/usermanage.h \
 		../1356M/booksmanage.h \
-		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QDateTimeEdit \
-		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/qdatetimeedit.h \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QDateEdit \
+		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/qdatetimeedit.h \
+		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QDate \
 		../1356M/record.h \
 		../1356M/widget.h \
 		debug/moc_predefs.h \
@@ -645,10 +645,10 @@ debug/moc_booksmanage.cpp: D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QObject \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/qdialog.h \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QGroupBox \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/qgroupbox.h \
-		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QDateTimeEdit \
+		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QDateEdit \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/qdatetimeedit.h \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qdatetime.h \
-		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QDateEdit \
+		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QDate \
 		../1356M/sqlite.h \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtSql/QSqlDatabase \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtSql/qsqldatabase.h \
@@ -1394,9 +1394,9 @@ debug/main.o: ../1356M/main.cpp ../1356M/widget.h \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QString \
 		../1356M/usermanage.h \
 		../1356M/booksmanage.h \
-		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QDateTimeEdit \
-		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/qdatetimeedit.h \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QDateEdit \
+		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/qdatetimeedit.h \
+		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QDate \
 		../1356M/record.h \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QApplication \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/qapplication.h \
@@ -1587,9 +1587,9 @@ debug/widget.o: ../1356M/widget.cpp ../1356M/widget.h \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QString \
 		../1356M/usermanage.h \
 		../1356M/booksmanage.h \
-		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QDateTimeEdit \
-		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/qdatetimeedit.h \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QDateEdit \
+		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/qdatetimeedit.h \
+		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QDate \
 		../1356M/record.h \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QFile
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\widget.o ..\1356M\widget.cpp
@@ -1899,10 +1899,10 @@ debug/booksmanage.o: ../1356M/booksmanage.cpp ../1356M/booksmanage.h \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/qdialog.h \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QGroupBox \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/qgroupbox.h \
-		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QDateTimeEdit \
+		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QDateEdit \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/qdatetimeedit.h \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qdatetime.h \
-		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QDateEdit \
+		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QDate \
 		../1356M/sqlite.h \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtSql/QSqlDatabase \
 		D:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtSql/qsqldatabase.h \

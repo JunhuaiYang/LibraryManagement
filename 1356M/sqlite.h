@@ -19,7 +19,7 @@ public:
     QSqlQuery Select(QString table, QString value, QString where);//查询
     bool InsertUser(QString cardID, QString name, QString gender, int age, QString tel);//插入用户表
     bool InsertBooks(QString booksID, QString goodsID, QString name, QString author, QString publishing_house, QString book_type, QString rent_days, QString publishing_time);//插入图书表
-    bool InsertRecord(QString cardID, QString booksID);//插入记录表
+    bool InsertRecord(QString booksID, QString cardID, QString lend_time);//插入记录表
     bool DeleteUser(QString cardID = NULL, QString name = NULL, QString gender = NULL, int age = -1);//删除用户表中数据
     bool DeleteBooks(QString booksID = NULL);//删除图书表中数据
     bool DeleteRecord(QString cardID = NULL, QString booksID = NULL);//删除记录表中数据
