@@ -35,6 +35,7 @@ public:
     void ShowTable(QSqlQuery query);//显示表格
     void SetInfo(QString cardID);//获取卡号
     void Clear();//清空文本框和表格信息
+    static int GetHowManyDays(QDateTime start, QDateTime end);
 
 private:
     QLineEdit *Edit_User[Edit_Count_BORROW_RETURN];//用户文本框

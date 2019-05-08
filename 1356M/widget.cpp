@@ -40,6 +40,18 @@ Widget::Widget(QWidget *parent)
 
     this->setLayout(MainLayout);
     setSlot();//设置槽函数
+
+    // TEST
+    qDebug()<< QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    QDateTime lendtime = QDateTime::fromString("2019-5-8 10:00:00", "yyyy-MM-dd hh:mm:ss");
+    QDateTime currenttime = QDateTime::fromString("2019-5-10 9:59:59", "yyyy-MM-dd hh:mm:ss");
+//    qDebug()<< QDateTime::fromMSecsSinceEpoch(currenttime.toMSecsSinceEpoch()-lendtime.toMSecsSinceEpoch()).toString("dd hh:mm:ss");
+//    uint stime = lendtime.toTime_t();
+//    uint etime = currenttime.toTime_t();
+//    int ndaysec = 24*60*60;
+//     qDebug() << "Day = " << (etime - stime)/(ndaysec) ;
+     qDebug() << "Day = " << Borrow_Return::GetHowManyDays(lendtime, currenttime);
+
 }
 
 void Widget::Set_Tab()
@@ -131,12 +143,13 @@ void Widget::getSerialName(QStringList *list)
     }
 }
 
+// 设置信号槽
 void Widget::setSlot()
 {
     connect(Connect_PushButton[Connect], SIGNAL(clicked()), this, SLOT(Uhf_Connect_Button_Click()));  //连接按钮单击事件连接Uhf_Connect_Button_Click()函数
     connect(Connect_PushButton[Disconnect], SIGNAL(clicked()), this, SLOT(Uhf_Disconnect_Button_Click()));//断开按钮单击事件连接Uhf_Disconnect_Button_Click()函数
     connect(uhf, SIGNAL(receivedMsg(QByteArray)), this, SLOT(Get_Info(QByteArray)), Qt::BlockingQueuedConnection);//刷卡响应连接到槽函数Get_Info()
-    connect(uhf, SIGNAL(cycle()), this, SLOT(Get_User_Info()), Qt::BlockingQueuedConnection);//刷卡响应连接到槽函数Get_User_Info()
+    connect(uhf, SIGNAL(cycle()), this, SLOT(Get_User_Info()), Qt::BlockingQueuedConnection);//循环读取卡号 刷卡响应连接到槽函数Get_User_Info()
     connect(Tab, SIGNAL(currentChanged(int)), this, SLOT(RefreshWidget(int)));//选项卡改变事件连接到槽函数RefreshWidget()
 }
 
@@ -179,7 +192,7 @@ void Widget::Get_Info(QByteArray Info)
 
 }
 
-//获取卡号
+// 循环读卡，向串口发送读卡指令
 void Widget::Get_User_Info()
 {
     uhf->ReadCardID();//向串口发送读卡命令

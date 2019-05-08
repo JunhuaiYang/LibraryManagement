@@ -13,6 +13,7 @@
 #include <QSerialPortInfo>
 #include <QSerialPort>
 #include <QMessageBox>
+#include <QDateTime>
 #include "borrow_return.h"
 #include "usermanage.h"
 #include "booksmanage.h"

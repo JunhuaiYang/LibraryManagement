@@ -194,7 +194,7 @@ QSqlQuery Sqlite::SelectBooks(QString booksID, QString name, QString author, QSt
 }
 
 // 查找用户借书
-QSqlQuery Sqlite::SelectRecord(QString cardID, QString booksID)
+QSqlQuery Sqlite::SelectRecord(QString cardID, QString booksID, bool isRenting)
 {
     QString where;
     if( !cardID.isEmpty() )
@@ -206,6 +206,9 @@ QSqlQuery Sqlite::SelectRecord(QString cardID, QString booksID)
         else
             where += ("and booksID = '" + booksID+"' ");
     }
+    // 是否正在借阅
+    if(isRenting)
+        where += ("and isRenting = '是' ");
     return Select("record_15693", "*", where);
 }
 

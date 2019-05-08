@@ -27,7 +27,7 @@ public:
     bool UpdataBooks(QString booksID = NULL, QString goodsID = NULL, QString name = NULL, QString author = NULL, QString publishing_house = NULL, QString book_type = NULL, QString publishing_time = NULL, QString rent_days = NULL, QString isRent = NULL);//修改图书表中信息
     QSqlQuery SelectUser(QString cardID = NULL, QString name = NULL, QString gender = NULL, int age = -1, QString telphone = NULL);//查找用户表中信息
     QSqlQuery SelectBooks(QString booksID = NULL, QString name = NULL, QString author = NULL, QString publishing_house = NULL, QString book_type = NULL);//查找图书表中信息
-    QSqlQuery SelectRecord(QString cardID = NULL, QString booksID = NULL);
+    QSqlQuery SelectRecord(QString cardID = NULL, QString booksID = NULL, bool isRenting = false);
     QSqlQuery SelectBooksOfBorrow(QString cardID);//查找某用户借的书
 
     ~Sqlite();

@@ -167,10 +167,15 @@ void Borrow_Return::SetInfo(QString cardID)
             if(ret == QMessageBox::Ok)
             {
                 // 加入记录表
-                if(sql->InsertRecord(query.value(0).toString(), Edit_User[CardId_User_Borrow]->text(), "sdf" ))
+                if(!sql->InsertRecord(query.value(0).toString(), Edit_User[CardId_User_Borrow]->text(),
+                                      QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") ))
+                    QMessageBox::warning(parentWidget(), tr("错误！"), tr("数据库操作错误！"), QMessageBox::Ok, QMessageBox::NoButton);
                 //书籍的状态改为已借出
-                sql->UpdataBooks(query.value(0).toString(),query.value(1).toString(),query.value(2).toString(),query.value(3).toString(),
-                                 query.value(4).toString(),query.value(5).toString(),query.value(6).toString(), query.value(7).toString(), "是" );
+                if(!sql->UpdataBooks(query.value(0).toString(),query.value(1).toString(),query.value(2).toString(),query.value(3).toString(),
+                                     query.value(4).toString(),query.value(5).toString(),query.value(6).toString(), query.value(7).toString(), "是" ))
+                    QMessageBox::warning(parentWidget(), tr("错误！"), tr("数据库操作错误！"), QMessageBox::Ok, QMessageBox::NoButton);
+
+                // TODO 写卡
 
             }
 
@@ -178,14 +183,29 @@ void Borrow_Return::SetInfo(QString cardID)
         // 还书
         else
         {
+            QSqlQuery record_query = sql->SelectRecord(Edit_User[CardId_User_Borrow]->text(), query.value(0).toString(), true);
             // TODO 该书籍没有被该用户借出
-//            if(!sql->SelectRecord(Edit_User[CardId_User_Borrow]->text(), query.value(0).toString()).next())
-//            {
-//                QMessageBox::information(parentWidget(), tr("提示！"), tr("该书没有被您借出！\n还书失败！"),
-//                                          QMessageBox::Ok, QMessageBox::NoButton);
-//                return;
-//            }
-//                书籍状态改为已还书
+            if(!record_query.next())
+            {
+                QMessageBox::information(parentWidget(), tr("提示！"), tr("该书没有被您借出！\n还书失败！"),
+                                          QMessageBox::Ok, QMessageBox::NoButton);
+                return;
+            }
+            // 获取借书时间
+            QDateTime lendtime = QDateTime::fromString(record_query.value(4).toString(), "yyyy-MM-dd hh:mm:ss");
+            QDateTime currenttime = QDateTime::currentDateTime();
+            //QDateTime::fromMSecsSinceEpoch()
+
+            //  弹窗确认还书信息
+            QMessageBox msg;
+            QString return_info;
+            return_info = "书名   ：  "+query.value(2).toString()+"\n"+
+                    "作者   ：  "+query.value(3).toString()+"\n"+
+                    "出版社 ：  "+query.value(4).toString()+"\n"+
+                    "可借天数：  "+query.value(6).toString()+" 天\n\n"+
+                    "借书时间：  "+record_query.value(4).toString()+"\n"+
+                    "已借时间：  "  ;
+            //    书籍状态改为已还书
             sql->UpdataBooks(query.value(0).toString(),query.value(1).toString(),query.value(2).toString(),query.value(3).toString(),
                              query.value(4).toString(),query.value(5).toString(),query.value(6).toString(), query.value(7).toString(), "否" );
             // TODO 更新表格
@@ -213,4 +233,13 @@ void Borrow_Return::Clear()
     // 设置状态栏
     Status->setText("请先刷卡登录！");
 
+}
+
+// 返回相差多少天
+int Borrow_Return::GetHowManyDays(QDateTime start, QDateTime end)
+{
+    const int ndaysec = 24*60*60;
+    uint stime = start.toTime_t();
+    uint etime = end.toTime_t();
+    return (etime - stime)/(ndaysec);
 }
