@@ -3,11 +3,13 @@
 //还书界面
 Record::Record(QWidget *parent) : QWidget(parent)
 {    
+    QLabel *Status = new QLabel("可通过刷卡搜索查看某本书或某个用户的记录");
     QVBoxLayout *MainLayout = new QVBoxLayout();//主布局
     QHBoxLayout *TableLayout = new QHBoxLayout();//表格布局
     QHBoxLayout *ButtonLayout = new QHBoxLayout();//按钮布局
     QHBoxLayout *EditLayout = new QHBoxLayout();//按钮布局
     QVBoxLayout *TopLayout = new QVBoxLayout();//上部布局
+
     QStringList LabelText,ButtonText;
     ButtonText<<"搜索"<<"删除";
     for(int i=0; i<Button_Count_Record; i++)
@@ -39,6 +41,7 @@ Record::Record(QWidget *parent) : QWidget(parent)
     Table->setSelectionBehavior ( QAbstractItemView::SelectRows);//选中整行
     Table->setEditTriggers ( QAbstractItemView::NoEditTriggers );//不可编辑
     Table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//列宽度自适应
+    Table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);     //然后设置要根据内容使用宽度的列
 
     TableLayout->addWidget(Table);
     TopLayout->addLayout(EditLayout);
@@ -50,6 +53,7 @@ Record::Record(QWidget *parent) : QWidget(parent)
     MainLayout->addWidget(GroupBox);
     MainLayout->addLayout(ButtonLayout);
     MainLayout->addWidget(TabGroupBox);
+    MainLayout->addWidget(Status);
     this->setLayout(MainLayout);
     SetSlot();
 }
@@ -73,7 +77,7 @@ void Record::select_record()
 void Record::delete_record()
 {
     //删除书籍
-    bool ret = sql->DeleteRecord(Edit[UserID_Record]->text(),Edit[BookID_Record]->text());
+    bool ret = sql->DeleteRecord(Edit[0]->text());
     if(!ret)
     {
         QMessageBox::warning(NULL, "warning", "删除失败！", QMessageBox::Yes, QMessageBox::Yes);
@@ -96,16 +100,18 @@ void Record::ClearEdit()
 //单击表格 在文本框中显示表格点击的行的数据
 void Record::get_table_line(int row, int col)
 {
-    for(int i = 0; i < Edit_Count_Record; i++)
-    {
-        Edit[i]->setText(Table->item(row,i)->text());
-    }
+    Edit[0]->setText(Table->item(row,2)->text());
+    Edit[1]->setText(Table->item(row,5)->text());
+//    for(int i = 0; i < Edit_Count_Record; i++)
+//    {
+//        Edit[i]->setText(Table->item(row,i)->text());
+//    }
 }
 //显示表格
 void Record::ShowTable(QSqlQuery query)
 {
     //表头
-    Table->setHorizontalHeaderLabels(QStringList()<<"用户卡号"<<"书籍卡号");
+    Table->setHorizontalHeaderLabels(QStringList()<<"记录编号"<<"是否在借"<<"用户卡号"<<"用户姓名"<<"手机号"<<"书籍卡号"<<"书名"<<"作者"<<"出版社"<<"借书时间"<<"还书时间" );
     if(!query.next())
     {
         Table->setRowCount(0);//表格设置行数
@@ -131,6 +137,7 @@ void Record::ShowTable(QSqlQuery query)
 void Record::Clear()
 {
     ShowTable(sql->SelectRecord());
+    //Status->setText("");
 }
 
 //设置卡号
@@ -146,5 +153,10 @@ void Record::SetCard(QString cardID)
     if(query.next())//如果是书
     {
         Edit[BookID_Record]->setText(cardID);//显示用户卡号
+        return;
     }
+    //Status->setText("该卡没有在本系统中注册！");
+    QMessageBox::information(parentWidget(), tr("提示！"), tr("该卡没有在系统中注册！"),
+                              QMessageBox::Ok, QMessageBox::NoButton);
+
 }

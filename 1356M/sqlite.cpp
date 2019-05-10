@@ -13,6 +13,8 @@ bool Sqlite::Connect()
     query.exec("create table user_15693 (cardID vchar, name vchar,  gender vchar, age int, telphone vchar(12), isLocked bool, primary key (cardID))");
     query.exec("create table books_15693 (booksID vchar, goodsID vchar, name vchar, author vchar, publishing_house vchar, book_type vchar, rent_days int, publishing_time vchar, isRent vchar, primary key (booksID))");
     query.exec("create table record_15693 (recordID integer PRIMARY KEY autoincrement , cardID vchar, booksID vchar, lend_time vchar, return_time vchar,isRenting vchar, FOREIGN KEY (cardID ) REFERENCES user_15693(cardID), FOREIGN KEY (booksID ) REFERENCES books_15693(booksID))");
+    // 创建视图
+    query.exec("create view record_view as select record_15693.recordID, record_15693.isRenting, record_15693.cardID, user_15693.name, user_15693.telphone, record_15693.booksID , books_15693.name, books_15693.author, books_15693.publishing_house,  record_15693.lend_time, record_15693.return_time  from books_15693 , record_15693, user_15693 where record_15693.booksID = books_15693.booksID and record_15693.cardID = user_15693.cardID ");
     return true;
 }
 //打印SQL语句
@@ -90,18 +92,10 @@ bool Sqlite::DeleteBooks(QString booksID)
     return Delete("books_15693", where);
 }
 //删除record表中数据
-bool Sqlite::DeleteRecord(QString cardID, QString booksID)
+bool Sqlite::DeleteRecord(QString recordID)
 {
-    QString where;
-    if( !cardID.isEmpty() )
-        where += ("cardID = '" + cardID +"' ");
-    if( !booksID.isEmpty() )
-    {
-        if(where.isEmpty())
-            where += ("booksID = '" + booksID+"' ");
-        else
-            where += ("and booksID = '" + booksID+"' ");
-    }
+    QString where = "recordID = '";
+    where += (recordID+"' ");
     return Delete("record_15693", where);
 }
 //修改user表中数据
@@ -115,8 +109,15 @@ bool Sqlite::UpdataBooks(QString booksID, QString goodsID, QString name, QString
     if( isRent.isEmpty() )
         return Updata("books_15693","booksID = '"+booksID+"', name = '"+name+"', author = '"+author+"', publishing_house = '"+publishing_house+ "', goodsID = '"+goodsID+ "', book_type = '"+book_type+ "', rent_days = "+ rent_days+ ", publishing_time = '"+publishing_time+"'", "booksID = '"+booksID+"'");
     else
-        return Updata("books_15693","booksID = '"+booksID+"', name = '"+name+"', author = '"+author+"', publishing_house = '"+publishing_house+ "', goodsID = '"+goodsID+ "', isRent = '"+isRent+"', book_type = '"+book_type+ "', publishing_time = '"+publishing_time+"'", "booksID = '"+booksID+"'");
+        return Updata("books_15693", "booksID = '"+booksID+"', name = '"+name+"', author = '"+author+"', publishing_house = '"+publishing_house+ "', goodsID = '"+goodsID+ "', isRent = '"+isRent+"', book_type = '"+book_type+ "', publishing_time = '"+publishing_time+"'", "booksID = '"+booksID+"'");
 }
+
+// TODO 修改record表中的数据
+bool Sqlite::UpdateRecord(int rID, QString return_time)
+{
+    return Updata("record_15693", "return_time = '" + return_time + "', isRenting = '否'", "recordID = '" + QString::number(rID) + "'" );
+}
+
 //查询user表中数据
 QSqlQuery Sqlite::SelectUser(QString cardID, QString name, QString gender, int age, QString telphone)
 {
@@ -209,7 +210,7 @@ QSqlQuery Sqlite::SelectRecord(QString cardID, QString booksID, bool isRenting)
     // 是否正在借阅
     if(isRenting)
         where += ("and isRenting = '是' ");
-    return Select("record_15693", "*", where);
+    return Select("record_view", "*", where);
 }
 
 //查找借的书

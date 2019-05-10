@@ -128,8 +128,11 @@ void Borrow_Return::SetInfo(QString cardID)
         Status->setText("登录成功！   请刷书籍卡借书或还书。");
         return;
     }
+
+
+    //如果是书
     query = sql->SelectBooks(cardID);
-    if(query.next())//如果是书
+    if(query.next())
     {
         // 如果未登录
         if(Edit_User[CardId_User_Borrow]->text().isEmpty())
@@ -141,7 +144,7 @@ void Borrow_Return::SetInfo(QString cardID)
         if(Borrow->isChecked())
         {
             // TODO 该书籍已被自己借出
-            if(sql->SelectRecord(Edit_User[CardId_User_Borrow]->text(), query.value(0).toString()).next())
+            if(sql->SelectRecord(Edit_User[CardId_User_Borrow]->text(), query.value(0).toString()).next(),true)
             {
                 QMessageBox::information(parentWidget(), tr("提示！"), tr("该书籍已经被您借出\n若需要归还请点击还书按钮！！"),
                                      QMessageBox::Ok, QMessageBox::NoButton);
@@ -169,13 +172,14 @@ void Borrow_Return::SetInfo(QString cardID)
                 // 加入记录表
                 if(!sql->InsertRecord(query.value(0).toString(), Edit_User[CardId_User_Borrow]->text(),
                                       QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") ))
-                    QMessageBox::warning(parentWidget(), tr("错误！"), tr("数据库操作错误！"), QMessageBox::Ok, QMessageBox::NoButton);
+                    QMessageBox::critical(parentWidget(), tr("错误！"), tr("数据库操作错误！"), QMessageBox::Ok, QMessageBox::NoButton);
                 //书籍的状态改为已借出
                 if(!sql->UpdataBooks(query.value(0).toString(),query.value(1).toString(),query.value(2).toString(),query.value(3).toString(),
                                      query.value(4).toString(),query.value(5).toString(),query.value(6).toString(), query.value(7).toString(), "是" ))
-                    QMessageBox::warning(parentWidget(), tr("错误！"), tr("数据库操作错误！"), QMessageBox::Ok, QMessageBox::NoButton);
+                    QMessageBox::critical(parentWidget(), tr("错误！"), tr("数据库操作错误！"), QMessageBox::Ok, QMessageBox::NoButton);
 
                 // TODO 写卡
+
 
             }
 
@@ -194,7 +198,6 @@ void Borrow_Return::SetInfo(QString cardID)
             // 获取借书时间
             QDateTime lendtime = QDateTime::fromString(record_query.value(4).toString(), "yyyy-MM-dd hh:mm:ss");
             QDateTime currenttime = QDateTime::currentDateTime();
-            //QDateTime::fromMSecsSinceEpoch()
 
             //  弹窗确认还书信息
             QMessageBox msg;
@@ -204,14 +207,34 @@ void Borrow_Return::SetInfo(QString cardID)
                     "出版社 ：  "+query.value(4).toString()+"\n"+
                     "可借天数：  "+query.value(6).toString()+" 天\n\n"+
                     "借书时间：  "+record_query.value(4).toString()+"\n"+
-                    "已借时间：  "  ;
-            //    书籍状态改为已还书
-            sql->UpdataBooks(query.value(0).toString(),query.value(1).toString(),query.value(2).toString(),query.value(3).toString(),
-                             query.value(4).toString(),query.value(5).toString(),query.value(6).toString(), query.value(7).toString(), "否" );
-            // TODO 更新表格
-//            if(sql->DeleteRecord(Edit_User[CardId_User_Borrow]->text(), query.value(0).toString()))//将用户ID和书籍编号添加到数据表中
-//            {
-//            }
+                    "已借时间：  "+ QString::number( GetHowManyDays(lendtime, currenttime) ) + " 天\n";
+            if(GetHowManyDays(lendtime, currenttime) > query.value(6).toInt())
+            {
+                return_info += "状态    ：  已超时! \n\n";
+            }
+            else {
+                return_info += "状态    ：  未超时 \n\n";
+            }
+            return_info += "请确认是否还书？";
+            int ret = msg.question(parentWidget(),tr("还书"),return_info , QMessageBox::Ok, QMessageBox::Cancel);
+            // 确定
+            if(ret == QMessageBox::Ok)
+            {
+                // 更新表格
+                if(!sql->UpdateRecord(record_query.value(0).toInt(), currenttime.toString("yyyy-MM-dd hh:mm:ss")))//更新还书时间
+                {
+                    QMessageBox::critical(parentWidget(), tr("错误！"), tr("数据库操作错误！"), QMessageBox::Ok, QMessageBox::NoButton);
+                }
+
+                //    书籍状态改为已还书
+                if(!sql->UpdataBooks(query.value(0).toString(),query.value(1).toString(),query.value(2).toString(),query.value(3).toString(),
+                                     query.value(4).toString(),query.value(5).toString(),query.value(6).toString(), query.value(7).toString(), "否" ))
+                    QMessageBox::critical(parentWidget(), tr("错误！"), tr("数据库操作错误！"), QMessageBox::Ok, QMessageBox::NoButton);
+
+            }
+            // TODO 写卡
+
+
         }
         ShowTable(sql->SelectBooksOfBorrow(Edit_User[0]->text()));//显示表格内容
         return;
