@@ -122,6 +122,8 @@ void BooksManage::delete_books()
         return;
     }
 
+    // 先删除记录表中的，解除依赖关系
+    sql->DeleteRecordBook(Edit[ID_Books]->text());
     //删除书籍
     bool ret = sql->DeleteBooks(Edit[ID_Books]->text());
     if(!ret)

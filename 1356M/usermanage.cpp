@@ -92,7 +92,7 @@ void UserManage::SetSlot()
     connect(Button[Select_User],SIGNAL(clicked()),this,SLOT(select_user()));//搜索按钮连接槽函数
     connect(Edit_Button[Lost_User],SIGNAL(clicked()),this,SLOT(clickedLostUser()));//挂失按钮连接槽函数
     connect(Edit_Button[Find_User],SIGNAL(clicked()),this,SLOT(clickedFindUser()));//取消挂失按钮连接槽函数
-    connect(Edit_Button[Logout_User],SIGNAL(clicked()),this,SLOT(clickedLogoutUser()));//注销按钮连接槽函数
+    connect(Edit_Button[Logout_User],SIGNAL(clicked()),this,SLOT(updata_user()));//注销按钮连接槽函数
     connect(Table,SIGNAL(cellClicked(int,int)),this,SLOT(get_table_line(int, int)));//表格点击连接槽函数
 }
 
@@ -209,13 +209,23 @@ void UserManage::delete_user()
     else
         Age = Edit[Age_User]->text().toInt();
 
-    int ret = sql->DeleteUser(Edit[ID_User]->text(),Edit[Name_User]->text(),Edit[Gender_User]->text(),Age);
-    if(!ret)
+    // 弹出提示框
+    QMessageBox msg;
+    int rett = msg.warning(parentWidget(),tr("警告！"), "是否要将用户注销？", QMessageBox::Ok, QMessageBox::Cancel);
+    // 确定
+    if(rett == QMessageBox::Ok)
     {
-        QMessageBox::warning(NULL, "warning", "删除失败！", QMessageBox::Yes, QMessageBox::Yes);
-        return;
+        // 先删除记录表中的，解除依赖关系
+        sql->DeleteRecordUser(Edit[ID_User]->text());
+        int ret = sql->DeleteUser(Edit[ID_User]->text(),Edit[Name_User]->text(),Edit[Gender_User]->text(),Age);
+        if(!ret)
+        {
+            QMessageBox::warning(NULL, "warning", "删除失败！", QMessageBox::Yes, QMessageBox::Yes);
+            return;
+        }
+        QMessageBox::warning(NULL, "warning", "删除成功！", QMessageBox::Yes, QMessageBox::Yes);
     }
-    QMessageBox::warning(NULL, "warning", "删除成功！", QMessageBox::Yes, QMessageBox::Yes);
+
     ClearEdit();
     ShowTable(sql->SelectUser());
 }

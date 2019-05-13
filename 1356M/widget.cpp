@@ -28,9 +28,18 @@ Widget::Widget(QWidget *parent)
 //    this->setStyleSheet(stylesheet);
 //      file.close();
 
+    /*设置图片*/
+    QLabel *Picture = new QLabel();
+    QPixmap jpg(":/img/img/book.jpg");
+    jpg = jpg.scaled(70,70, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    Picture->setPixmap(jpg);
+    //Picture->setMaximumSize(50,50);
+
     Init_Connect_Operation_Box();//设置连接操作组合框中内容
 
+
     TopLayout->addStretch(0);
+    TopLayout->addWidget(Picture);
     TopLayout->addWidget(Title);
     TopLayout->addStretch(0);
     TopLayout->addWidget(ConnectGroupBox);
@@ -42,15 +51,15 @@ Widget::Widget(QWidget *parent)
     setSlot();//设置槽函数
 
     // TEST
-    qDebug()<< QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-    QDateTime lendtime = QDateTime::fromString("2019-5-8 10:00:00", "yyyy-MM-dd hh:mm:ss");
-    QDateTime currenttime = QDateTime::fromString("2019-5-10 9:59:59", "yyyy-MM-dd hh:mm:ss");
+//    qDebug()<< QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+//    QDateTime lendtime = QDateTime::fromString("2019-5-8 10:00:00", "yyyy-MM-dd hh:mm:ss");
+//    QDateTime currenttime = QDateTime::fromString("2019-5-10 9:59:59", "yyyy-MM-dd hh:mm:ss");
 //    qDebug()<< QDateTime::fromMSecsSinceEpoch(currenttime.toMSecsSinceEpoch()-lendtime.toMSecsSinceEpoch()).toString("dd hh:mm:ss");
 //    uint stime = lendtime.toTime_t();
 //    uint etime = currenttime.toTime_t();
 //    int ndaysec = 24*60*60;
 //     qDebug() << "Day = " << (etime - stime)/(ndaysec) ;
-     qDebug() << "Day = " << Borrow_Return::GetHowManyDays(lendtime, currenttime);
+//     qDebug() << "Day = " << Borrow_Return::GetHowManyDays(lendtime, currenttime);
 
 }
 

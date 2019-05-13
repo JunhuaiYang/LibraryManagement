@@ -23,7 +23,8 @@
 
 #define Edit_Count_BORROW_RETURN 5//用户信息文本框个数
 #define Label_Count_BORROW_RETURN 5//用户信息标签个数
-#define Table_Column_BORROW_RETURN 6//表格列数
+#define Table_Column_BORROW_RETURN 8//表格列数
+
 
 enum Edit_Index_User_Borrow{CardId_User_Borrow = 0, Name_User_Borrow, Gender_User_Borrow, Age_User_Borrowm, Tel_User_Borrow};//卡号、姓名、性别、年龄
 
@@ -36,11 +37,13 @@ public:
     void SetInfo(QString cardID);//获取卡号
     void Clear();//清空文本框和表格信息
     static int GetHowManyDays(QDateTime start, QDateTime end);
+    QString FORMAT = "yyyy-MM-dd hh:mm:ss";
 
 private:
     QLineEdit *Edit_User[Edit_Count_BORROW_RETURN];//用户文本框
     QLabel *Label_User[Label_Count_BORROW_RETURN];//用户标签
     QLabel *Status; //状态栏
+    QLabel *Info;  // 提示
     QRadioButton *Borrow,*Return; //借书 还书 单选按钮
     QButtonGroup *Function;//选择功能（借书、还书）
     QTableWidget *Table;//表格

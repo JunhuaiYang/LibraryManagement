@@ -42,6 +42,8 @@ Record::Record(QWidget *parent) : QWidget(parent)
     Table->setEditTriggers ( QAbstractItemView::NoEditTriggers );//不可编辑
     Table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//列宽度自适应
     Table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);     //然后设置要根据内容使用宽度的列
+    Table->horizontalHeader()->setSectionResizeMode(10, QHeaderView::ResizeToContents);     //然后设置要根据内容使用宽度的列
+    Table->horizontalHeader()->setSectionResizeMode(9, QHeaderView::ResizeToContents);     //然后设置要根据内容使用宽度的列
 
     TableLayout->addWidget(Table);
     TopLayout->addLayout(EditLayout);

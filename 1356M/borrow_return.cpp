@@ -11,6 +11,9 @@ Borrow_Return::Borrow_Return(QWidget *parent) : QWidget(parent)
     QVBoxLayout *RightLayout = new QVBoxLayout();//右侧布局
     QHBoxLayout *ButtonLayout = new QHBoxLayout();//右侧布局
     Status = new QLabel();  // 状态栏
+    Info = new QLabel("欢迎：");
+    Info->setMinimumHeight(200);
+    Status->setMaximumHeight(30);
 
     //组合框
     QGroupBox *BooksGroupBox = new QGroupBox();
@@ -29,6 +32,7 @@ Borrow_Return::Borrow_Return(QWidget *parent) : QWidget(parent)
         Layout->addWidget(Edit_User[i]);
         UserLayout->addLayout(Layout);
     }
+
 
     //借还书单选按钮
     Borrow = new QRadioButton("借书");
@@ -50,22 +54,17 @@ Borrow_Return::Borrow_Return(QWidget *parent) : QWidget(parent)
     Table->setSelectionBehavior ( QAbstractItemView::SelectRows);//选择方式为选中整行
     Table->setEditTriggers ( QAbstractItemView::NoEditTriggers );//不可编辑
     Table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//列宽度自适应
+    Table->horizontalHeader()->setSectionResizeMode(5, QHeaderView::ResizeToContents);     //然后设置要根据内容使用宽度的列
+    Table->horizontalHeader()->setSectionResizeMode(6, QHeaderView::ResizeToContents);     //然后设置要根据内容使用宽度的列
 
     RightLayout->addWidget(Table);
 
     BooksGroupBox->setTitle("借书列表");//设置组合框标题
     BooksGroupBox->setLayout(RightLayout);
 
-    /*设置图片*/
-    QLabel *Picture = new QLabel();
-    QImage *jpg = new QImage(":/img/img/book.jpg");
-    Picture->setPixmap(QPixmap::fromImage(*jpg));
-
-
-
     MainLayout->addWidget(UserGroupBox,0,0,1,1);
     MainLayout->addWidget(BooksGroupBox,0,1,2,1);
-    MainLayout->addWidget(Picture,1,0,1,1);
+    MainLayout->addWidget(Info,1,0,1,1);
     MainLayout->addWidget(Status,2,0,1,2);
     MainLayout->setSpacing(20);
     this->setLayout(MainLayout);
@@ -77,28 +76,73 @@ Borrow_Return::Borrow_Return(QWidget *parent) : QWidget(parent)
 //表格显示
 void Borrow_Return::ShowTable(QSqlQuery query)
 {
+
     //设置表格表头
-    Table->setHorizontalHeaderLabels(QStringList()<<"用户卡号"<<"书名"<<"作者"<<"出版社"<<"总数（本）"<<"剩余（本）");
+    Table->setHorizontalHeaderLabels(QStringList()<<"是否在借"<<"图书卡号"<<"书名"<<"作者"<<"出版社"<<"借书时间"<<"还书时间"<<"已借时间");
     if(!query.next())
     {
         Table->setRowCount(0);//表格设置行数
         return;
     }
+
     /*计算record表中数据行数*/
     query.last();//跳转到最后一条数据
     int nRow = query.at() + 1;//取所在行数
     Table->setRowCount(nRow);//表格设置行数
     int row = 0;
     query.first();//返回第一条数据
+    QString username = query.value(3).toString();
+    QDateTime lendtime;
+    QDateTime returntime;
+    QString days;
+    QString renting = "当前借书列表：\n";
+    int count_rent = 0, overtime_count = 0;
     do
     {
-        for (int col = 0; col<7; col++)//按字段添加数据
+        lendtime  = QDateTime::fromString(query.value(9).toString(), FORMAT);
+        // 看是否已还
+        if(query.value(1) == "否")
         {
-            //表格中添加数据库中的数据
-            Table->setItem(row, col, new QTableWidgetItem(query.value(col).toString()));
+            returntime = QDateTime::fromString(query.value(10).toString(), FORMAT);
+            days = QString::asprintf("%-3d天(已完成)", GetHowManyDays(lendtime, returntime));
         }
+        else {
+            count_rent++;
+            returntime = QDateTime::currentDateTime();
+            int day = GetHowManyDays(lendtime, returntime);
+//            qDebug() << days << "  " << day << returntime.toString()<< " lt" << lendtime.toString() ;
+            // 超时
+            if(day > query.value(11).toInt())
+            {
+                overtime_count++;
+                days = QString::asprintf("%-3d天(已超时)", day);
+                renting += ( query.value(6).toString() + "  已超时！超时 "+ QString::number(day - query.value(11).toInt())+ " 天\n");
+            }
+            else {
+                days = QString::asprintf("%-3d天(正在借)", day);
+                renting += ( "《"+ query.value(6).toString() + "》  还剩" + QString::number(query.value(11).toInt() - day)+ " 天\n" );
+            }
+
+        }
+//        qDebug() << days;
+        //表格中添加数据库中的数据
+        Table->setItem(row, 1-1, new QTableWidgetItem(query.value(1).toString()));
+        Table->setItem(row, 2-1, new QTableWidgetItem(query.value(5).toString()));
+        Table->setItem(row, 3-1, new QTableWidgetItem(query.value(6).toString()));
+        Table->setItem(row, 4-1, new QTableWidgetItem(query.value(7).toString()));
+        Table->setItem(row, 5-1, new QTableWidgetItem(query.value(8).toString()));
+        Table->setItem(row, 6-1, new QTableWidgetItem(query.value(9).toString()));
+        Table->setItem(row, 7-1, new QTableWidgetItem(query.value(10).toString()));
+        Table->setItem(row, 8-1, new QTableWidgetItem(days));  // 已借时间
         row++;//行数增加
     }while(query.next());
+    // 更新 Info
+    QString Infoma = QString::asprintf("欢迎：%s\n当前借书：%-2d本\n当前已超时:%-2d本\n\n", username.toStdString().c_str(), count_rent, overtime_count );
+    if(count_rent){
+        Infoma += renting;
+    }
+    Info->setText(Infoma);
+
 }
 
 //设置用户信息(卡ID)
@@ -121,7 +165,7 @@ void Borrow_Return::SetInfo(QString cardID)
             Edit_User[i]->setText(query.value(i).toString());
         }
         //将书信息显示到表格中
-        ShowTable(sql->SelectBooksOfBorrow(cardID));//显示表格内容
+        ShowTable(sql->SelectRecord(cardID));//显示表格内容
         // 显示表格
         Table->setEnabled(true);
         // 更新状态栏
@@ -236,7 +280,7 @@ void Borrow_Return::SetInfo(QString cardID)
 
 
         }
-        ShowTable(sql->SelectBooksOfBorrow(Edit_User[0]->text()));//显示表格内容
+        ShowTable(sql->SelectRecord(Edit_User[0]->text()));//显示表格内容
         return;
     }
     Status->setText("该卡没有在本系统中注册！");
@@ -250,7 +294,12 @@ void Borrow_Return::Clear()
     {
         Edit_User[i]->clear();
     }
-    ShowTable(sql->SelectBooksOfBorrow(Edit_User[0]->text()));//显示表格内容
+//    Edit_User[0]->setText("123");
+    QSqlQuery empty;
+    if(Edit_User[0]->text().isEmpty())
+        ShowTable(empty);
+    else
+        ShowTable(sql->SelectRecord(Edit_User[0]->text()));//显示表格内容
     Table->setDisabled(true);
 
     // 设置状态栏

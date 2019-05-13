@@ -23,6 +23,8 @@ public:
     bool DeleteUser(QString cardID = NULL, QString name = NULL, QString gender = NULL, int age = -1);//删除用户表中数据
     bool DeleteBooks(QString booksID = NULL);//删除图书表中数据
     bool DeleteRecord(QString recordID);//删除记录表中数据
+    bool DeleteRecordUser(QString cardID);//删除记录表中数据
+    bool DeleteRecordBook(QString bookID);//删除记录表中数据
     bool UpdataUser(QString cardID, QString name, QString gender, int age, QString tel );//修改用户表中信息
     bool UpdataBooks(QString booksID = NULL, QString goodsID = NULL, QString name = NULL, QString author = NULL, QString publishing_house = NULL, QString book_type = NULL, QString publishing_time = NULL, QString rent_days = NULL, QString isRent = NULL);//修改图书表中信息
     bool UpdateRecord(int rID, QString return_time);

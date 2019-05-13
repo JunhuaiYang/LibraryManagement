@@ -14,7 +14,7 @@ bool Sqlite::Connect()
     query.exec("create table books_15693 (booksID vchar, goodsID vchar, name vchar, author vchar, publishing_house vchar, book_type vchar, rent_days int, publishing_time vchar, isRent vchar, primary key (booksID))");
     query.exec("create table record_15693 (recordID integer PRIMARY KEY autoincrement , cardID vchar, booksID vchar, lend_time vchar, return_time vchar,isRenting vchar, FOREIGN KEY (cardID ) REFERENCES user_15693(cardID), FOREIGN KEY (booksID ) REFERENCES books_15693(booksID))");
     // 创建视图
-    query.exec("create view record_view as select record_15693.recordID, record_15693.isRenting, record_15693.cardID, user_15693.name, user_15693.telphone, record_15693.booksID , books_15693.name, books_15693.author, books_15693.publishing_house,  record_15693.lend_time, record_15693.return_time  from books_15693 , record_15693, user_15693 where record_15693.booksID = books_15693.booksID and record_15693.cardID = user_15693.cardID ");
+    query.exec("create view record_view as select record_15693.recordID, record_15693.isRenting, record_15693.cardID, user_15693.name, user_15693.telphone, record_15693.booksID , books_15693.name, books_15693.author, books_15693.publishing_house,  record_15693.lend_time, record_15693.return_time, books_15693.rent_days  from books_15693 , record_15693, user_15693 where record_15693.booksID = books_15693.booksID and record_15693.cardID = user_15693.cardID ");
     return true;
 }
 //打印SQL语句
@@ -98,6 +98,21 @@ bool Sqlite::DeleteRecord(QString recordID)
     where += (recordID+"' ");
     return Delete("record_15693", where);
 }
+//删除record表中数据 通过用户
+bool Sqlite::DeleteRecordUser(QString cardID)
+{
+    QString where = "cardID = '";
+    where += (cardID+"' ");
+    return Delete("record_15693", where);
+}
+//删除record表中数据 通过书籍
+bool Sqlite::DeleteRecordBook(QString bookID)
+{
+    QString where = "bookID = '";
+    where += (bookID+"' ");
+    return Delete("record_15693", where);
+}
+
 //修改user表中数据
 bool Sqlite::UpdataUser(QString cardID, QString name, QString gender, int age, QString tel)
 {
