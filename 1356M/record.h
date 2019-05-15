@@ -20,7 +20,7 @@
 #define Button_Count_Record 2//按钮个数
 #define Label_Count_Record 2//标签个数
 
-enum Label_Index_Record{UserID_Record = 2, BookID_Record=5};
+enum Label_Index_Record{UserID_Record = 0, BookID_Record=1};
 enum Button_Index_Record{Select_Record = 0, Delete_Record};
 
 class Record : public QWidget
@@ -45,6 +45,7 @@ private:
     QTableWidget *Table;//表格
     QLabel *Status; // 状态栏
     Sqlite *sql;//数据库相关操作的类
+    int select_row;
 };
 
 #endif // Record_H

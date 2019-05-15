@@ -31,7 +31,7 @@ BooksManage::BooksManage(QWidget *parent) : QWidget(parent)
     QRegExp regExp(pattern);
     Edit[ID_Books]->setValidator(new QRegExpValidator(regExp, this));
 
-    regExp.setPattern("[9-0]{13}");
+    regExp.setPattern("[9-0]{10}");
     Edit[GoodsID]->setValidator(new QRegExpValidator(regExp, this));
 
     regExp.setPattern("[9-0]{3}");
@@ -54,6 +54,7 @@ BooksManage::BooksManage(QWidget *parent) : QWidget(parent)
     Table->setSelectionBehavior ( QAbstractItemView::SelectRows);//选中整行
     Table->setEditTriggers ( QAbstractItemView::NoEditTriggers );//不可编辑
     Table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//列宽度自适应
+    Table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);     //然后设置要根据内容使用宽度的列
     TableLayout->addWidget(Table);
 
     BookTable->setLayout(TableLayout);
@@ -187,7 +188,7 @@ void BooksManage::ShowTable(QSqlQuery query)
     query.first();//返回第一条数据
     do
     {
-        for (int col = 0; col<Table->columnCount(); col++)//按字段添加数据
+        for (int col = 0; col< Table->columnCount(); col++)//按字段添加数据
         {
             //表格中添加数据库中的数据
             Table->setItem(row, col, new QTableWidgetItem(query.value(col).toString()));

@@ -92,7 +92,7 @@ void UserManage::SetSlot()
     connect(Button[Select_User],SIGNAL(clicked()),this,SLOT(select_user()));//搜索按钮连接槽函数
     connect(Edit_Button[Lost_User],SIGNAL(clicked()),this,SLOT(clickedLostUser()));//挂失按钮连接槽函数
     connect(Edit_Button[Find_User],SIGNAL(clicked()),this,SLOT(clickedFindUser()));//取消挂失按钮连接槽函数
-    connect(Edit_Button[Logout_User],SIGNAL(clicked()),this,SLOT(updata_user()));//注销按钮连接槽函数
+    connect(Edit_Button[Logout_User],SIGNAL(clicked()),this,SLOT(delete_user()));//注销按钮连接槽函数
     connect(Table,SIGNAL(cellClicked(int,int)),this,SLOT(get_table_line(int, int)));//表格点击连接槽函数
 }
 

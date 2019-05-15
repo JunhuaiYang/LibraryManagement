@@ -172,7 +172,7 @@ void Widget::Get_Info(QByteArray Info)
     {
 //        bool ok;
 //        QByteArray fcs(*Info.end());
-//        //QByteArray fcs("AB");
+//        QByteArray fcs("AB");
 //        qDebug()<<Info<<endl;
 //        qDebug()<<fcs<<endl;
 //        qDebug()<<Dll.RC632_UartCalcFCS(((uint8*)(Info.data()+4)),BUILD_UINT8(Info.at(3),Info.at(2))-1)<<"  "<< fcs.toInt(&ok,16)<<"  " << ok <<endl;

@@ -56,6 +56,8 @@ Borrow_Return::Borrow_Return(QWidget *parent) : QWidget(parent)
     Table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//列宽度自适应
     Table->horizontalHeader()->setSectionResizeMode(5, QHeaderView::ResizeToContents);     //然后设置要根据内容使用宽度的列
     Table->horizontalHeader()->setSectionResizeMode(6, QHeaderView::ResizeToContents);     //然后设置要根据内容使用宽度的列
+    Table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);     //然后设置要根据内容使用宽度的列
+    Table->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);     //然后设置要根据内容使用宽度的列
 
     RightLayout->addWidget(Table);
 
@@ -188,7 +190,7 @@ void Borrow_Return::SetInfo(QString cardID)
         if(Borrow->isChecked())
         {
             // TODO 该书籍已被自己借出
-            if(sql->SelectRecord(Edit_User[CardId_User_Borrow]->text(), query.value(0).toString()).next(),true)
+            if(sql->SelectRecord(Edit_User[CardId_User_Borrow]->text(), query.value(0).toString(), true).next())
             {
                 QMessageBox::information(parentWidget(), tr("提示！"), tr("该书籍已经被您借出\n若需要归还请点击还书按钮！！"),
                                      QMessageBox::Ok, QMessageBox::NoButton);
@@ -240,7 +242,7 @@ void Borrow_Return::SetInfo(QString cardID)
                 return;
             }
             // 获取借书时间
-            QDateTime lendtime = QDateTime::fromString(record_query.value(4).toString(), "yyyy-MM-dd hh:mm:ss");
+            QDateTime lendtime = QDateTime::fromString(record_query.value(9).toString(), "yyyy-MM-dd hh:mm:ss");
             QDateTime currenttime = QDateTime::currentDateTime();
 
             //  弹窗确认还书信息
@@ -250,14 +252,14 @@ void Borrow_Return::SetInfo(QString cardID)
                     "作者   ：  "+query.value(3).toString()+"\n"+
                     "出版社 ：  "+query.value(4).toString()+"\n"+
                     "可借天数：  "+query.value(6).toString()+" 天\n\n"+
-                    "借书时间：  "+record_query.value(4).toString()+"\n"+
+                    "借书时间：  "+record_query.value(9).toString()+"\n"+
                     "已借时间：  "+ QString::number( GetHowManyDays(lendtime, currenttime) ) + " 天\n";
-            if(GetHowManyDays(lendtime, currenttime) > query.value(6).toInt())
+            if(GetHowManyDays(lendtime, currenttime) > query.value(11).toInt())
             {
-                return_info += "状态    ：  已超时! \n\n";
+                return_info += "状态     ：  已超时! \n\n";
             }
             else {
-                return_info += "状态    ：  未超时 \n\n";
+                return_info += "状态     ：  未超时 \n\n";
             }
             return_info += "请确认是否还书？";
             int ret = msg.question(parentWidget(),tr("还书"),return_info , QMessageBox::Ok, QMessageBox::Cancel);
@@ -304,6 +306,7 @@ void Borrow_Return::Clear()
 
     // 设置状态栏
     Status->setText("请先刷卡登录！");
+    Info->setText("欢迎：");
 
 }
 

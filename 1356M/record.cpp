@@ -44,6 +44,9 @@ Record::Record(QWidget *parent) : QWidget(parent)
     Table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);     //然后设置要根据内容使用宽度的列
     Table->horizontalHeader()->setSectionResizeMode(10, QHeaderView::ResizeToContents);     //然后设置要根据内容使用宽度的列
     Table->horizontalHeader()->setSectionResizeMode(9, QHeaderView::ResizeToContents);     //然后设置要根据内容使用宽度的列
+    Table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);     //然后设置要根据内容使用宽度的列
+    Table->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);     //然后设置要根据内容使用宽度的列
+    Table->horizontalHeader()->setSectionResizeMode(7, QHeaderView::ResizeToContents);     //然后设置要根据内容使用宽度的列
 
     TableLayout->addWidget(Table);
     TopLayout->addLayout(EditLayout);
@@ -79,7 +82,7 @@ void Record::select_record()
 void Record::delete_record()
 {
     //删除书籍
-    bool ret = sql->DeleteRecord(Edit[0]->text());
+    bool ret = sql->DeleteRecord(Table->item(select_row ,0)->text());
     if(!ret)
     {
         QMessageBox::warning(NULL, "warning", "删除失败！", QMessageBox::Yes, QMessageBox::Yes);
@@ -104,6 +107,7 @@ void Record::get_table_line(int row, int col)
 {
     Edit[0]->setText(Table->item(row,2)->text());
     Edit[1]->setText(Table->item(row,5)->text());
+    select_row = row;
 //    for(int i = 0; i < Edit_Count_Record; i++)
 //    {
 //        Edit[i]->setText(Table->item(row,i)->text());
