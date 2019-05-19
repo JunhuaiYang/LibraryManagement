@@ -89,6 +89,7 @@ void BooksManage::add_books()//添加按钮槽函数
             return;
         }
     }
+    // 判断卡号是否已经注册为用户
     if (sql->SelectUser(Edit[ID_Books]->text()).next())
     {
         QMessageBox::warning(NULL, "warning", "卡号已经注册为用户！", QMessageBox::Yes, QMessageBox::Yes);

@@ -1,0 +1,5 @@
+create table user_15693 (cardID vchar, name vchar,  gender vchar, age int, telphone vchar(12), isLocked bool, primary key (cardID))
+create table books_15693 (booksID vchar, goodsID vchar, name vchar, author vchar, publishing_house vchar, book_type vchar, rent_days int, publishing_time vchar, isRent vchar, primary key (booksID))
+create table record_15693 (recordID integer PRIMARY KEY autoincrement , cardID vchar, booksID vchar, lend_time vchar, return_time vchar,isRenting vchar, FOREIGN KEY (cardID ) REFERENCES user_15693(cardID), FOREIGN KEY (booksID ) REFERENCES books_15693(booksID))
+
+create view record_view as select record_15693.recordID, record_15693.isRenting, record_15693.cardID, user_15693.name, user_15693.telphone, record_15693.booksID , books_15693.name, books_15693.author, books_15693.publishing_house,  record_15693.lend_time, record_15693.return_time, books_15693.rent_days  from books_15693 , record_15693, user_15693 where record_15693.booksID = books_15693.booksID and record_15693.cardID = user_15693.cardID 

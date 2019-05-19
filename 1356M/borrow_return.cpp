@@ -75,7 +75,8 @@ Borrow_Return::Borrow_Return(QWidget *parent) : QWidget(parent)
     Clear();
 
 }
-//表格显示
+
+//表格显示和提示信息显示
 void Borrow_Return::ShowTable(QSqlQuery query)
 {
 
@@ -189,6 +190,7 @@ void Borrow_Return::SetInfo(QString cardID)
         // 借书
         if(Borrow->isChecked())
         {
+            // 使用当前用户卡号和书籍卡号查找记录表
             // TODO 该书籍已被自己借出
             if(sql->SelectRecord(Edit_User[CardId_User_Borrow]->text(), query.value(0).toString(), true).next())
             {
